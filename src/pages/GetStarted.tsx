@@ -1,1406 +1,739 @@
-// import { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { motion } from 'framer-motion';
-// import { CheckCircle, AlertCircle, Lock, Shield, Server, Globe, Cloud, Smartphone, Cpu } from 'lucide-react';
-
-// // Define interfaces
-// interface FormData {
-//   [x: string]: string | number | readonly string[] | undefined;
-//   companyName: string;
-//   contactName: string;
-//   jobRole: string;
-//   contactEmail: string;
-//   contactPhone: string;
-//   companySize: string;
-//   industry: string;
-//   auditServices: string[];
-//   additionalDetails: string;
-// }
-
-// // // Mock Web3 integration function (would be replaced with actual implementation)
-// // const storeDataOnBlockchain = async (_data: any): Promise<string> => {
-// //   // Simulate blockchain storage delay
-// //   await new Promise(resolve => setTimeout(resolve, 2000));
-  
-// //   // Return fake transaction hash
-// //   return `0x${Math.random().toString(16).substring(2, 14)}${Math.random().toString(16).substring(2, 14)}`;
-// // };
-
-// const GetStarted = () => {
-//   const navigate = useNavigate();
-//   //const { isAuthenticated } = useAuth();
-//   const [currentStep, setCurrentStep] = useState(1);
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-//   const [isSuccess, setIsSuccess] = useState(false);
-//   const [error, setError] = useState('');
-//   // const [txHash, setTxHash] = useState('');
-  
-//   const [formData, setFormData] = useState<FormData>({
-//     companyName: '',
-//     contactName: '',
-//     jobRole: '',
-//     contactEmail: '',
-//     contactPhone: '',
-//     companySize: '',
-//     industry: '',
-//     auditServices: [],
-//     additionalDetails: '',
-//   });
-
-//   // useEffect(() => {
-//   //   if (!isAuthenticated) {
-//   //     navigate('/signup');
-//   //   }
-//   // }, [isAuthenticated, navigate]);
-  
-//   useEffect(() => {
-//     document.title = 'Get Started | BCBUZZ';
-//   }, []);
-
-//   // Handle form field changes
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-//     const { name, value } = e.target;
-//     setFormData(prev => ({
-//       ...prev,
-//       [name]: value
-//     }));
-//   };
-
-//   // Handle navigation between steps
-//   const nextStep = () => {
-//     if (currentStep < 4) {
-//       setCurrentStep(prev => prev + 1);
-//     }
-//   };
-
-//   const prevStep = () => {
-//     if (currentStep > 1) {
-//       setCurrentStep(prev => prev - 1);
-//     }
-//   };
-
-//   // Handle audit service selection
-//   const handleServiceChange = (service: string) => {
-//     setFormData(prev => {
-//       const isSelected = prev.auditServices.includes(service);
-//       return {
-//         ...prev,
-//         auditServices: isSelected 
-//           ? prev.auditServices.filter(s => s !== service)
-//           : [...prev.auditServices, service]
-//       };
-//     });
-//   };
-
-//   // Handle form submission
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     setError('');
-
-//     // Validate required fields
-//     if (
-//       !formData.companyName ||
-//       !formData.contactName ||
-//       !formData.jobRole ||
-//       !formData.contactEmail ||
-//       !formData.companySize ||
-//       !formData.industry ||
-//       formData.auditServices.length === 0
-//     ) {
-//       setError('Please fill in all required fields.');
-//       return;
-//     }
-
-//     setIsSubmitting(true);}
-
-//     try {
-//   //     // Store data on blockchain
-//   //     const tx = await storeDataOnBlockchain(formData);
-//   //     setTxHash(tx);
-//       setIsSuccess(true);
-
-//   //     // Redirect to home after 5 seconds
-//   //     setTimeout(() => {
-//   //       navigate('/');
-//   //     }, 5000);
-//   //   } catch (err) {
-//   //     setError('An error occurred while storing data on the blockchain.');
-//   //     console.error(err);
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-
-
-//   return (
-//     <>
-     
-      
-//       <section className="min-h-screen pt-32 pb-20 md:pt-40 md:pb-28">
-//         <div className="container mx-auto px-4 relative z-10">
-//           <motion.div 
-//             className="max-w-4xl mx-auto glass-card mb-10"
-//             initial={{ opacity: 0, y: 20 }}
-//             animate={{ opacity: 1, y: 0 }}
-//             transition={{ duration: 0.5 }}
-//           >
-//             <div className="text-center mb-8">
-//               <h1 className="text-3xl font-bold mb-4">Get Started with BCBUZZ</h1>
-//               <p className="text-gray-300">
-//                 Complete the form below to begin your security audit journey. All information is
-//                 securely stored on blockchain for maximum protection.
-//               </p>
-//             </div>
-            
-//             {/* Progress Bar */}
-//             <div className="mb-10 relative">
-//               <div className="h-1 bg-navy-800 w-full rounded-full">
-//                 <div 
-//                   className="h-1 bg-electric-blue rounded-full transition-all duration-500"
-//                   style={{ width: `${(currentStep / (isSuccess ? 5 : 4)) * 100}%` }}
-//                 ></div>
-//               </div>
-              
-//               <div className="flex justify-between -mt-2.5">
-//                 {[1, 2, 3, 4].map(step => (
-//                   <div 
-//                     key={step} 
-//                     className={`w-5 h-5 rounded-full flex items-center justify-center z-10 
-//                     ${currentStep >= step ? 'bg-electric-blue' : 'bg-navy-800'}`}
-//                   >
-//                     {currentStep > step && (
-//                       <CheckCircle className="h-4 w-4 text-white" />
-//                     )}
-//                   </div>
-//                 ))}
-//               </div>
-              
-//               <div className="flex justify-between mt-2 text-xs text-gray-400">
-//                 <span>Company Details</span>
-//                 <span>Business Info</span>
-//                 <span>Audit Selection</span>
-//                 <span>Review</span>
-//               </div>
-//             </div>
-            
-//             {/* Error Message */}
-//             {error && (
-//               <div className="bg-red-900/30 text-red-300 p-4 rounded-lg mb-6 flex items-center">
-//                 <AlertCircle className="h-5 w-5 mr-2 shrink-0" />
-//                 <span>{error}</span>
-//               </div>
-//             )}
-            
-//             {/* Success Message */}
-//             {isSuccess ? (
-//               <motion.div
-//                 className="text-center py-8"
-//                 initial={{ opacity: 0 }}
-//                 animate={{ opacity: 1 }}
-//                 transition={{ duration: 0.5 }}
-//               >
-//                 <div className="mb-6 mx-auto h-24 w-24 relative">
-//                   {/* <ThreeDCube color="#10B981" wireframe={false} speed={0.008} /> */}
-//                 </div>
-//                 <CheckCircle className="h-16 w-16 text-neon-green mx-auto mb-4" />
-//                 <h2 className="text-2xl font-bold mb-2">Request Submitted Successfully!</h2>
-//                 <p className="text-gray-300 mb-4">
-//                   Your request has been successfully received our team has been notified.
-//                   We'll contact you shortly to discuss the next steps.
-//                 </p>
-//               </motion.div>
-//             ) : (
-//               <form onSubmit={handleSubmit}>
-//                 {/* Step 1: Company Details */}
-//                 {currentStep === 1 && (
-//                   <motion.div
-//                     initial={{ opacity: 0, x: 20 }}
-//                     animate={{ opacity: 1, x: 0 }}
-//                     exit={{ opacity: 0, x: -20 }}
-//                     transition={{ duration: 0.3 }}
-//                     className="space-y-6"
-//                   >
-//                     <h2 className="text-xl font-medium mb-4">Company Details</h2>
-                    
-//                     <div>
-//                       <label htmlFor="companyName" className="block text-sm font-medium text-gray-300 mb-1">
-//                         Company Name <span className="text-red-500">*</span>
-//                       </label>
-//                       <input
-//                         type="text"
-//                         id="companyName"
-//                         name="companyName"
-//                         value={formData.companyName}
-//                         onChange={handleChange}
-//                         required
-//                         className="w-full px-4 py-2 bg-navy-800 border border-navy-700 rounded-md focus:outline-none focus:ring-2 focus:ring-electric-blue text-white"
-//                       />
-//                     </div>
-                    
-//                     <div>
-//                       <label htmlFor="contactName" className="block text-sm font-medium text-gray-300 mb-1">
-//                         Contact Name <span className="text-red-500">*</span>
-//                       </label>
-//                       <input
-//                         type="text"
-//                         id="contactName"
-//                         name="contactName"
-//                         value={formData.contactName}
-//                         onChange={handleChange}
-//                         required
-//                         className="w-full px-4 py-2 bg-navy-800 border border-navy-700 rounded-md focus:outline-none focus:ring-2 focus:ring-electric-blue text-white"
-//                       />
-//                     </div>
-
-//                     {/* Job Role Field */}
-//                     <div>
-//                       <label htmlFor="jobRole" className="block text-sm font-medium text-gray-300 mb-1">
-//                         Job Role <span className="text-red-500">*</span>
-//                       </label>
-//                       <input
-//                         type="text"
-//                         id="jobRole"
-//                         name="jobRole"
-//                         value={formData.jobRole}
-//                         onChange={handleChange}
-//                         required
-//                         className="w-full px-4 py-2 bg-navy-800 border border-navy-700 rounded-md focus:outline-none focus:ring-2 focus:ring-electric-blue text-white"
-//                       />
-//                     </div>
-                    
-//                     <div>
-//                       <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-300 mb-1">
-//                         Contact Email <span className="text-red-500">*</span>
-//                       </label>
-//                       <input
-//                         type="email"
-//                         id="contactEmail"
-//                         name="contactEmail"
-//                         value={formData.contactEmail}
-//                         onChange={(e) => {
-//                           handleChange(e);  // Always update the state with the input value
-//                         }}
-//                         onBlur={(e) => {
-//                           const email = e.target.value;
-//                           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//                           if (email && !emailRegex.test(email)) {
-//                             // If the email is not valid, set an error or show a message
-//                             setError('Please enter a valid email address.');
-//                           } else {
-//                             setError('');
-//                           }
-//                         }}
-//                         required
-//                         className="w-full px-4 py-2 bg-navy-800 border border-navy-700 rounded-md focus:outline-none focus:ring-2 focus:ring-electric-blue text-white"
-//                       />
-//                     </div>
-                    
-//                     <div>
-//                       <label htmlFor="contactPhone" className="block text-sm font-medium text-gray-300 mb-1">
-//                         Contact Phone
-//                       </label>
-//                       <input
-//                         type="tel"
-//                         id="contactPhone"
-//                         name="contactPhone"
-//                         value={formData.contactPhone}
-//                         onChange={(e) => {
-//                           const onlyNums = e.target.value.replace(/\D/g, '');
-//                           handleChange({
-//                             ...e,
-//                             target: {
-//                               ...e.target,
-//                               name: 'contactPhone',
-//                               value: onlyNums
-//                             }
-//                           });
-//                         }}
-//                         inputMode="numeric"
-//                         pattern="[0-9]{7,15}"
-//                         required
-//                         className="w-full px-4 py-2 bg-navy-800 border border-navy-700 rounded-md focus:outline-none focus:ring-2 focus:ring-electric-blue text-white"
-//                       />
-//                     </div>
-//                   </motion.div>
-//                 )}
-                
-//                 {/* Step 2: Business Information */}
-//                 {currentStep === 2 && (
-//                   <motion.div
-//                     initial={{ opacity: 0, x: 20 }}
-//                     animate={{ opacity: 1, x: 0 }}
-//                     exit={{ opacity: 0, x: -20 }}
-//                     transition={{ duration: 0.3 }}
-//                     className="space-y-6"
-//                   >
-//                     <h2 className="text-xl font-medium mb-4">Business Information</h2>
-                    
-//                     <div>
-//                       <label htmlFor="companySize" className="block text-sm font-medium text-gray-300 mb-1">
-//                         Company Size <span className="text-red-500">*</span>
-//                       </label>
-//                       <select
-//                         id="companySize"
-//                         name="companySize"
-//                         value={formData.companySize}
-//                         onChange={handleChange}
-//                         required
-//                         className="w-full px-4 py-2 bg-navy-800 border border-navy-700 rounded-md focus:outline-none focus:ring-2 focus:ring-electric-blue text-white"
-//                       >
-//                         <option value="">Select company size</option>
-//                         <option value="1-10">1-10 employees</option>
-//                         <option value="11-50">11-50 employees</option>
-//                         <option value="51-200">51-200 employees</option>
-//                         <option value="201-500">201-500 employees</option>
-//                         <option value="501-1000">501-1000 employees</option>
-//                         <option value="1000+">1000+ employees</option>
-//                       </select>
-//                     </div>
-                    
-//                     <div>
-//                       <label htmlFor="industry" className="block text-sm font-medium text-gray-300 mb-1">
-//                         Industry <span className="text-red-500">*</span>
-//                       </label>
-//                       <select
-//                         id="industry"
-//                         name="industry"
-//                         value={formData.industry}
-//                         onChange={handleChange}
-//                         required
-//                         className="w-full px-4 py-2 bg-navy-800 border border-navy-700 rounded-md focus:outline-none focus:ring-2 focus:ring-electric-blue text-white"
-//                       >
-//                         <option value="">Select industry</option>
-//                         <option value="Technology">Technology</option>
-//                         <option value="Finance">Finance</option>
-//                         <option value="Healthcare">Healthcare</option>
-//                         <option value="Retail">Retail</option>
-//                         <option value="Manufacturing">Manufacturing</option>
-//                         <option value="Education">Education</option>
-//                         <option value="Government">Government</option>
-//                         <option value="Energy">Energy</option>
-//                         <option value="Transportation">Transportation</option>
-//                         <option value="Other">Other</option>
-//                       </select>
-//                     </div>
-//                   </motion.div>
-//                 )}
-                
-//                 {/* Step 3: Audit Services */}
-//                 {currentStep === 3 && (
-//                   <motion.div
-//                     initial={{ opacity: 0, x: 20 }}
-//                     animate={{ opacity: 1, x: 0 }}
-//                     exit={{ opacity: 0, x: -20 }}
-//                     transition={{ duration: 0.3 }}
-//                     className="space-y-6"
-//                   >
-//                     <h2 className="text-xl font-medium mb-4">Select Audit Services</h2>
-//                     <p className="text-gray-400 mb-6">
-//                       Choose the security audit services you're interested in. You can select multiple options.
-//                     </p>
-                    
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                       <div className="glass-card hover:border-electric-blue transition-colors cursor-pointer">
-//                         <label className="flex items-start cursor-pointer">
-//                           <input
-//                             type="checkbox"
-//                             checked={formData.auditServices.includes('network')}
-//                             onChange={() => handleServiceChange('network')}
-//                             className="h-5 w-5 text-electric-blue rounded border-navy-700 focus:ring-electric-blue bg-navy-800 mt-1"
-//                           />
-//                           <div className="ml-3">
-//                             <div className="flex items-center">
-//                               <Server className="h-5 w-5 text-electric-blue mr-2" />
-//                               <span className="font-medium">Network Audit</span>
-//                             </div>
-//                             <p className="text-sm text-gray-400 mt-1">
-//                               Comprehensive assessment of your network infrastructure and security.
-//                             </p>
-//                           </div>
-//                         </label>
-//                       </div>
-                      
-//                       <div className="glass-card hover:border-electric-blue transition-colors cursor-pointer">
-//                         <label className="flex items-start cursor-pointer">
-//                           <input
-//                             type="checkbox"
-//                             checked={formData.auditServices.includes('web')}
-//                             onChange={() => handleServiceChange('web')}
-//                             className="h-5 w-5 text-electric-blue rounded border-navy-700 focus:ring-electric-blue bg-navy-800 mt-1"
-//                           />
-//                           <div className="ml-3">
-//                             <div className="flex items-center">
-//                               <Globe className="h-5 w-5 text-neon-green mr-2" />
-//                               <span className="font-medium">Web App Audit</span>
-//                             </div>
-//                             <p className="text-sm text-gray-400 mt-1">
-//                               Security assessment of your web applications and APIs.
-//                             </p>
-//                           </div>
-//                         </label>
-//                       </div>
-                      
-//                       <div className="glass-card hover:border-electric-blue transition-colors cursor-pointer">
-//                         <label className="flex items-start cursor-pointer">
-//                           <input
-//                             type="checkbox"
-//                             checked={formData.auditServices.includes('cloud')}
-//                             onChange={() => handleServiceChange('cloud')}
-//                             className="h-5 w-5 text-electric-blue rounded border-navy-700 focus:ring-electric-blue bg-navy-800 mt-1"
-//                           />
-//                           <div className="ml-3">
-//                             <div className="flex items-center">
-//                               <Cloud className="h-5 w-5 text-accent-purple mr-2" />
-//                               <span className="font-medium">Cloud Audit</span>
-//                             </div>
-//                             <p className="text-sm text-gray-400 mt-1">
-//                               Security assessment of your cloud infrastructure and configurations.
-//                             </p>
-//                           </div>
-//                         </label>
-//                       </div>
-                      
-//                       <div className="glass-card hover:border-electric-blue transition-colors cursor-pointer">
-//                         <label className="flex items-start cursor-pointer">
-//                           <input
-//                             type="checkbox"
-//                             checked={formData.auditServices.includes('mobile')}
-//                             onChange={() => handleServiceChange('mobile')}
-//                             className="h-5 w-5 text-electric-blue rounded border-navy-700 focus:ring-electric-blue bg-navy-800 mt-1"
-//                           />
-//                           <div className="ml-3">
-//                             <div className="flex items-center">
-//                               <Smartphone className="h-5 w-5 text-yellow-500 mr-2" />
-//                               <span className="font-medium">Mobile Audit</span>
-//                             </div>
-//                             <p className="text-sm text-gray-400 mt-1">
-//                               Security assessment of your mobile applications.
-//                             </p>
-//                           </div>
-//                         </label>
-//                       </div>
-                      
-//                       <div className="glass-card hover:border-electric-blue transition-colors cursor-pointer">
-//                         <label className="flex items-start cursor-pointer">
-//                           <input
-//                             type="checkbox"
-//                             checked={formData.auditServices.includes('iot')}
-//                             onChange={() => handleServiceChange('iot')}
-//                             className="h-5 w-5 text-electric-blue rounded border-navy-700 focus:ring-electric-blue bg-navy-800 mt-1"
-//                           />
-//                           <div className="ml-3">
-//                             <div className="flex items-center">
-//                               <Cpu className="h-5 w-5 text-red-500 mr-2" />
-//                               <span className="font-medium">IoT Audit</span>
-//                             </div>
-//                             <p className="text-sm text-gray-400 mt-1">
-//                               Security assessment of your IoT devices and infrastructure.
-//                             </p>
-//                           </div>
-//                         </label>
-//                       </div>
-//                     </div>
-                    
-//                     <div>
-//                       <label htmlFor="additionalDetails" className="block text-sm font-medium text-gray-300 mb-1">
-//                         Additional Details
-//                       </label>
-//                       <textarea
-//                         id="additionalDetails"
-//                         name="additionalDetails"
-//                         value={formData.additionalDetails}
-//                         onChange={handleChange}
-//                         rows={4}
-//                         className="w-full px-4 py-2 bg-navy-800 border border-navy-700 rounded-md focus:outline-none focus:ring-2 focus:ring-electric-blue text-white"
-//                         placeholder="Please provide any additional information about your security requirements..."
-//                       ></textarea>
-//                     </div>
-//                   </motion.div>
-//                 )}
-                
-//                 {/* Step 4: Review */}
-//                 {currentStep === 4 && (
-//                   <motion.div
-//                     initial={{ opacity: 0, x: 20 }}
-//                     animate={{ opacity: 1, x: 0 }}
-//                     exit={{ opacity: 0, x: -20 }}
-//                     transition={{ duration: 0.3 }}
-//                     className="space-y-6"
-//                   >
-//                     <h2 className="text-xl font-medium mb-4">Review Your Information</h2>
-//                     <p className="text-gray-400 mb-6">
-//                       Please review your information before submitting. This data will be securely stored on blockchain.
-//                     </p>
-                    
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//                       <div className="glass-card">
-//                         <h3 className="font-medium mb-3 flex items-center">
-//                           <Shield className="h-5 w-5 text-electric-blue mr-2" />
-//                           Company Details
-//                         </h3>
-//                         <ul className="space-y-2 text-gray-300">
-//                           <li><span className="text-gray-400">Company:</span> {formData.companyName}</li>
-//                           <li><span className="text-gray-400">Contact:</span> {formData.contactName}</li>
-//                           <li><span className="text-gray-400">Job Role:</span> {formData.jobRole}</li>
-//                           <li><span className="text-gray-400">Email:</span> {formData.contactEmail}</li>
-//                           <li><span className="text-gray-400">Phone:</span> {formData.contactPhone}</li>
-//                         </ul>
-//                       </div>
-                      
-//                       <div className="glass-card">
-//                         <h3 className="font-medium mb-3 flex items-center">
-//                           <Shield className="h-5 w-5 text-electric-blue mr-2" />
-//                           Business Information
-//                         </h3>
-//                         <ul className="space-y-2 text-gray-300">
-//                           <li><span className="text-gray-400">Company Size:</span> {formData.companySize}</li>
-//                           <li><span className="text-gray-400">Industry:</span> {formData.industry}</li>
-//                         </ul>
-//                       </div>
-//                     </div>
-                    
-//                     <div className="glass-card">
-//                       <h3 className="font-medium mb-3 flex items-center">
-//                         <Shield className="h-5 w-5 text-electric-blue mr-2" />
-//                         Selected Audit Services
-//                       </h3>
-//                       <div className="flex flex-wrap gap-2 mb-4">
-//                         {formData.auditServices.map(service => {
-//                           let icon;
-//                           let color;
-//                           let label;
-                          
-//                           switch(service) {
-//                             case 'network':
-//                               icon = <Server className="h-4 w-4" />;
-//                               color = 'bg-blue-900/30 text-electric-blue';
-//                               label = 'Network Audit';
-//                               break;
-//                             case 'web':
-//                               icon = <Globe className="h-4 w-4" />;
-//                               color = 'bg-green-900/30 text-neon-green';
-//                               label = 'Web App Audit';
-//                               break;
-//                             case 'cloud':
-//                               icon = <Cloud className="h-4 w-4" />;
-//                               color = 'bg-purple-900/30 text-accent-purple';
-//                               label = 'Cloud Audit';
-//                               break;
-//                             case 'mobile':
-//                               icon = <Smartphone className="h-4 w-4" />;
-//                               color = 'bg-yellow-900/30 text-yellow-500';
-//                               label = 'Mobile Audit';
-//                               break;
-//                             case 'iot':
-//                               icon = <Cpu className="h-4 w-4" />;
-//                               color = 'bg-red-900/30 text-red-500';
-//                               label = 'IoT Audit';
-//                               break;
-//                             case 'api':
-//                                 icon = <Server className="h-4 w-4" />;
-//                                 color = 'bg-red-900/30 text-red-500';
-//                                 label = 'API Audit';
-//                                 break;
-//                             default:
-//                               icon = <Shield className="h-4 w-4" />;
-//                               color = 'bg-blue-900/30 text-electric-blue';
-//                               label = service;
-//                           }
-                          
-//                           return (
-//                             <span key={service} className={`px-3 py-1 rounded-full flex items-center ${color}`}>
-//                               {icon}
-//                               <span className="ml-2">{label}</span>
-//                             </span>
-//                           );
-//                         })}
-//                       </div>
-                      
-//                       {formData.additionalDetails && (
-//                         <div>
-//                           <h4 className="text-sm font-medium text-gray-300 mb-2">Additional Details:</h4>
-//                           <p className="text-gray-400">{formData.additionalDetails}</p>
-//                         </div>
-//                       )}
-//                     </div>
-                    
-//                     <div className="bg-navy-800/50 p-4 rounded-lg border border-navy-700">
-//                       <div className="flex items-start mb-4">
-//                         <Lock className="h-5 w-5 text-electric-blue mr-3 shrink-0 mt-0.5" />
-//                         <p className="text-gray-300">
-//                           Your information will be securely stored on blockchain using our proprietary technology.
-//                           This ensures data integrity and immutability throughout the audit process.
-//                         </p>
-//                       </div>
-                      
-//                       <div className="flex items-center">
-//                         <input
-//                           type="checkbox"
-//                           id="consent"
-//                           required
-//                           className="h-4 w-4 text-electric-blue border-navy-700 rounded focus:ring-electric-blue bg-navy-800"
-//                         />
-//                         <label htmlFor="consent" className="ml-2 text-sm text-gray-300">
-//                           I agree to the processing of my data as described in the{' '}
-//                           <a href="#" className="text-electric-blue hover:text-blue-400">Privacy Policy</a>
-//                         </label>
-//                       </div>
-//                     </div>
-//                   </motion.div>
-//                 )}
-                
-//                 {/* Navigation Buttons */}
-//                 <div className="mt-8 flex justify-between">
-//                   {currentStep > 1 && (
-//                     <button
-//                       type="button"
-//                       onClick={prevStep}
-//                       className="btn-secondary"
-//                     >
-//                       Back
-//                     </button>
-//                   )}
-                  
-//                   {currentStep < 4 ? (
-//                     <button
-//                       type="button"
-//                       onClick={nextStep}
-//                       className="btn-primary ml-auto"
-//                     >
-//                       Next
-//                     </button>
-//                   ) : (
-//                     <button
-//                       type="submit"
-//                       disabled={isSubmitting}
-//                       className={`btn-primary ml-auto flex items-center ${
-//                         isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-//                       }`}
-//                     >
-//                       {isSubmitting ? (
-//                         <>
-//                           <svg className="animate-spin h-5 w-5 text-white mr-2" viewBox="0 0 24 24">
-//                             <circle
-//                               className="opacity-25"
-//                               cx="12"
-//                               cy="12"
-//                               r="10"
-//                               stroke="currentColor"
-//                               strokeWidth="4"
-//                             ></circle>
-//                             <path
-//                               className="opacity-75"
-//                               fill="currentColor"
-//                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-//                             ></path>
-//                           </svg>
-//                           Processing...
-//                         </>
-//                       ) : (
-//                         <>
-//                           Submit Request
-//                         </>
-//                       )}
-//                     </button>
-//                   )}
-//                 </div>
-//               </form>
-//             )}
-//           </motion.div>
-//         </div>
-//       </section>
-//     </>
-//   );
-
-//                       }
-// export default GetStarted;
-
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, AlertCircle, Lock, Shield, Server, Globe, Cloud, Smartphone, Cpu, Sun, Moon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+  ArrowRight,
+  Shield,
+  Globe,
+  Server,
+  Smartphone,
+  Database,
+  Wifi,
+  CheckCircle,
+  Calendar,
+  Clock,
+  User,
+  Mail,
+  Building,
+  Phone,
+  MapPin,
+  CreditCard,
+  Send
+} from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import HeroSection from '../components/get-started/HeroSection';
+import FeaturesSection from '../components/get-started/FeaturesSection';
+import ServicesSection from '../components/get-started/ServicesSection';
+import apiClient from '../lib/api';
 
-// Define interfaces
-interface FormData {
-  [x: string]: string | number | readonly string[] | undefined;
+interface AuditRequest {
+  auditType: string;
+  targetUrl: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  methodology: string;
+  estimatedDuration: string;
   companyName: string;
-  contactName: string;
-  jobRole: string;
   contactEmail: string;
   contactPhone: string;
-  companySize: string;
-  industry: string;
-  auditServices: string[];
-  additionalDetails: string;
+  contactName: string;
+  address: string;
+  budget: string;
+  preferredStartDate: string;
+  additionalRequirements: string;
 }
 
-const GetStarted = () => {
-  const { theme, toggleTheme } = useTheme();
+const GetStarted: React.FC = () => {
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState('');
-  
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<AuditRequest>({
+    auditType: '',
+    targetUrl: '',
+    description: '',
+    priority: 'medium',
+    methodology: '',
+    estimatedDuration: '',
     companyName: '',
-    contactName: '',
-    jobRole: '',
     contactEmail: '',
     contactPhone: '',
-    companySize: '',
-    industry: '',
-    auditServices: [],
-    additionalDetails: '',
+    contactName: '',
+    address: '',
+    budget: '',
+    preferredStartDate: '',
+    additionalRequirements: ''
   });
 
-  useEffect(() => {
-    document.title = 'Get Started | BCBUZZ';
-  }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const nextStep = () => {
-    if (currentStep < 4) {
-      setCurrentStep(prev => prev + 1);
+  const auditTypes = [
+    {
+      id: 'web',
+      name: 'Web Application Security',
+      description: 'Comprehensive testing of web applications for OWASP Top 10 vulnerabilities',
+      icon: Globe,
+      price: 'Starting at $2,999',
+      duration: '1-2 weeks'
+    },
+    {
+      id: 'network',
+      name: 'Network Security Audit',
+      description: 'In-depth network infrastructure assessment and penetration testing',
+      icon: Server,
+      price: 'Starting at $4,999',
+      duration: '2-3 weeks'
+    },
+    {
+      id: 'mobile',
+      name: 'Mobile App Security',
+      description: 'Security testing for iOS and Android applications',
+      icon: Smartphone,
+      price: 'Starting at $2,499',
+      duration: '1-2 weeks'
+    },
+    {
+      id: 'cloud',
+      name: 'Cloud Security Review',
+      description: 'Cloud infrastructure security assessment for AWS, Azure, GCP',
+      icon: Database,
+      price: 'Starting at $3,999',
+      duration: '2-4 weeks'
+    },
+    {
+      id: 'wireless',
+      name: 'Wireless Security',
+      description: 'WiFi penetration testing and wireless network security assessment',
+      icon: Wifi,
+      price: 'Starting at $1,499',
+      duration: '1 week'
     }
+  ];
+
+  const handleInputChange = (field: keyof AuditRequest, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
-    }
+  const handleAuditTypeSelect = (auditType: string) => {
+    setFormData(prev => ({ ...prev, auditType }));
+    setCurrentStep(2);
   };
 
-  const handleServiceChange = (service: string) => {
-    setFormData(prev => {
-      const isSelected = prev.auditServices.includes(service);
-      return {
-        ...prev,
-        auditServices: isSelected 
-          ? prev.auditServices.filter(s => s !== service)
-          : [...prev.auditServices, service]
-      };
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (
-      !formData.companyName ||
-      !formData.contactName ||
-      !formData.jobRole ||
-      !formData.contactEmail ||
-      !formData.companySize ||
-      !formData.industry ||
-      formData.auditServices.length === 0
-    ) {
-      setError('Please fill in all required fields.');
-      return;
-    }
-
+  const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      setIsSuccess(true);
+      await apiClient.post('/audit-requests', formData);
+      
+      // Show success message and redirect
+      alert('Audit request submitted successfully! You will receive a confirmation email shortly.');
+      navigate('/dashboard');
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Failed to submit audit request. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Glowing Background Elements */}
-      <motion.div
-        className="absolute inset-0 z-0"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      >
-        <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-secondary-dark/20 dark:bg-secondary-light/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-accent-dark/20 dark:bg-accent-light/20 rounded-full blur-3xl animate-pulse-slow" />
-      </motion.div>
+  const isStepValid = () => {
+    switch (currentStep) {
+      case 1:
+        return formData.auditType !== '';
+      case 2:
+        return formData.targetUrl && formData.description && formData.companyName;
+      case 3:
+        return formData.contactName && formData.contactEmail && formData.contactPhone;
+      case 4:
+        return formData.preferredStartDate && formData.budget;
+      default:
+        return false;
+    }
+  };
 
-      {/* Theme toggle button */}
-      <motion.button
-        className="fixed top-4 right-4 p-2 rounded-full bg-[#e0e0e0] dark:bg-surface-light/50 backdrop-blur-sm"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={toggleTheme}
-      >
-        {theme === 'dark' ? (
-          <Sun className="w-6 h-6 text-yellow-400" />
-        ) : (
-          <Moon className="w-6 h-6 text-indigo-600" />
-        )}
-      </motion.button>
-
-      <div className="container mx-auto px-4 relative z-10 max-w-4xl">
-        <motion.div 
-          className="glass-card p-8 rounded-xl backdrop-blur-sm bg-white/10 dark:bg-surface-dark/50 border border-white/10 dark:border-surface-light/10 shadow-xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-4 text-surface-dark dark:text-surface-light">Get Started with BCBUZZ</h1>
-            <p className="text-surface-dark/70 dark:text-surface-light/70">
-              Complete the form below to begin your security audit journey.
-            </p>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="mb-10 relative">
-            <div className="h-1 bg-surface-light/20 dark:bg-surface-dark/20 w-full rounded-full">
-              <div 
-                className="h-1 bg-accent-dark dark:bg-accent-light rounded-full transition-all duration-500"
-                style={{ width: `${(currentStep / (isSuccess ? 5 : 4)) * 100}%` }}
-              ></div>
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-8"
+          >
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Choose Your Audit Type
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                Select the type of security audit that best fits your needs
+              </p>
             </div>
-            
-            <div className="flex justify-between -mt-2.5">
-              {[1, 2, 3, 4].map(step => (
-                <div 
-                  key={step} 
-                  className={`w-5 h-5 rounded-full flex items-center justify-center z-10 
-                  ${currentStep >= step ? 'bg-accent-dark dark:bg-accent-light' : 'bg-surface-light/20 dark:bg-surface-dark/20'}`}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {auditTypes.map((audit, index) => (
+                <motion.div
+                  key={audit.id}
+                  className={`p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
+                    formData.auditType === audit.id
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600'
+                  } ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-white'}`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleAuditTypeSelect(audit.id)}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
                 >
-                  {currentStep > step && (
-                    <CheckCircle className="h-4 w-4 text-white dark:text-surface-dark" />
-                  )}
-                </div>
+                  <div className="flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-xl mb-4">
+                    <audit.icon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    {audit.name}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    {audit.description}
+                  </p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-blue-600 dark:text-blue-400 font-medium">
+                      {audit.price}
+                    </span>
+                    <span className="text-gray-500 dark:text-gray-400">
+                      {audit.duration}
+                    </span>
+                  </div>
+                </motion.div>
               ))}
             </div>
-            
-            <div className="flex justify-between mt-2 text-xs text-surface-dark/50 dark:text-surface-light/50">
-              <span>Company Details</span>
-              <span>Business Info</span>
-              <span>Audit Selection</span>
-              <span>Review</span>
-            </div>
-          </div>
-          
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-500/10 text-red-500 dark:text-red-400 p-4 rounded-lg mb-6 flex items-center">
-              <AlertCircle className="h-5 w-5 mr-2 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-          
-          {/* Success Message */}
-          {isSuccess ? (
-            <motion.div
-              className="text-center py-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <CheckCircle className="h-16 w-16 text-green-500 dark:text-green-400 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2 text-surface-dark dark:text-surface-light">Request Submitted Successfully!</h2>
-              <p className="text-surface-dark/70 dark:text-surface-light/70 mb-4">
-                Your request has been successfully received our team has been notified.
-                We'll contact you shortly to discuss the next steps.
+          </motion.div>
+        );
+
+      case 2:
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-8"
+          >
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Project Details
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                Tell us about your project and requirements
               </p>
-            </motion.div>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              {/* Step 1: Company Details */}
-              {currentStep === 1 && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6"
+            </div>
+
+            <div className="max-w-2xl mx-auto space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Company Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.companyName}
+                  onChange={(e) => handleInputChange('companyName', e.target.value)}
+                  className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Your company name"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Target URL/IP Address *
+                </label>
+                <input
+                  type="text"
+                  value={formData.targetUrl}
+                  onChange={(e) => handleInputChange('targetUrl', e.target.value)}
+                  className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="https://example.com or 192.168.1.1"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Project Description *
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  rows={4}
+                  className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Describe your project, scope, and any specific security concerns..."
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Priority Level
+                  </label>
+                  <select
+                    value={formData.priority}
+                    onChange={(e) => handleInputChange('priority', e.target.value)}
+                    className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Estimated Duration
+                  </label>
+                  <select
+                    value={formData.estimatedDuration}
+                    onChange={(e) => handleInputChange('estimatedDuration', e.target.value)}
+                    className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select duration</option>
+                    <option value="1-2 weeks">1-2 weeks</option>
+                    <option value="3-4 weeks">3-4 weeks</option>
+                    <option value="1-2 months">1-2 months</option>
+                    <option value="3+ months">3+ months</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Preferred Methodology
+                </label>
+                <select
+                  value={formData.methodology}
+                  onChange={(e) => handleInputChange('methodology', e.target.value)}
+                  className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <h2 className="text-xl font-medium mb-4 text-surface-dark dark:text-surface-light">Company Details</h2>
-                  
-                  <div>
-                    <label htmlFor="companyName" className="block text-sm font-medium mb-1 text-surface-dark/80 dark:text-surface-light/80">
-                      Company Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="companyName"
-                      name="companyName"
-                      value={formData.companyName}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 bg-surface-light/10 dark:bg-surface-dark/10 border border-surface-light/20 dark:border-surface-dark/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-dark/50 dark:focus:ring-accent-light/50 text-surface-dark dark:text-surface-light"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="contactName" className="block text-sm font-medium mb-1 text-surface-dark/80 dark:text-surface-light/80">
-                      Contact Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="contactName"
-                      name="contactName"
-                      value={formData.contactName}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 bg-surface-light/10 dark:bg-surface-dark/10 border border-surface-light/20 dark:border-surface-dark/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-dark/50 dark:focus:ring-accent-light/50 text-surface-dark dark:text-surface-light"
-                    />
+                  <option value="">Select methodology</option>
+                  <option value="OWASP Testing Guide">OWASP Testing Guide</option>
+                  <option value="NIST Framework">NIST Framework</option>
+                  <option value="PCI DSS">PCI DSS</option>
+                  <option value="ISO 27001">ISO 27001</option>
+                  <option value="Custom">Custom</option>
+                </select>
+              </div>
+            </div>
+          </motion.div>
+        );
+
+      case 3:
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-8"
+          >
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Contact Information
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                How can we reach you about this audit?
+              </p>
+            </div>
+
+            <div className="max-w-2xl mx-auto space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Contact Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.contactName}
+                  onChange={(e) => handleInputChange('contactName', e.target.value)}
+                  className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Your full name"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.contactEmail}
+                    onChange={(e) => handleInputChange('contactEmail', e.target.value)}
+                    className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="contact@company.com"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.contactPhone}
+                    onChange={(e) => handleInputChange('contactPhone', e.target.value)}
+                    className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="+1 (555) 123-4567"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Company Address
+                </label>
+                <textarea
+                  value={formData.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  rows={3}
+                  className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Street address, city, state, zip code"
+                />
+              </div>
+            </div>
+          </motion.div>
+        );
+
+      case 4:
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-8"
+          >
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Schedule & Budget
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                When would you like to start and what's your budget?
+              </p>
+            </div>
+
+            <div className="max-w-2xl mx-auto space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Preferred Start Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.preferredStartDate}
+                    onChange={(e) => handleInputChange('preferredStartDate', e.target.value)}
+                    className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Budget Range *
+                  </label>
+                  <select
+                    value={formData.budget}
+                    onChange={(e) => handleInputChange('budget', e.target.value)}
+                    className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select budget range</option>
+                    <option value="$1,000 - $5,000">$1,000 - $5,000</option>
+                    <option value="$5,000 - $10,000">$5,000 - $10,000</option>
+                    <option value="$10,000 - $25,000">$10,000 - $25,000</option>
+                    <option value="$25,000 - $50,000">$25,000 - $50,000</option>
+                    <option value="$50,000+">$50,000+</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Additional Requirements
+                </label>
+                <textarea
+                  value={formData.additionalRequirements}
+                  onChange={(e) => handleInputChange('additionalRequirements', e.target.value)}
+                  rows={4}
+                  className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Any specific requirements, compliance needs, or special considerations..."
+                />
+              </div>
+            </div>
+          </motion.div>
+        );
+
+      case 5:
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-8"
+          >
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Review Your Request
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                Please review your audit request before submitting
+              </p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                      Audit Details
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Type:</span>
+                        <span className="font-medium text-gray-900 dark:text-white capitalize">
+                          {auditTypes.find(t => t.id === formData.auditType)?.name}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Target:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {formData.targetUrl}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Priority:</span>
+                        <span className="font-medium text-gray-900 dark:text-white capitalize">
+                          {formData.priority}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Duration:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {formData.estimatedDuration}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="jobRole" className="block text-sm font-medium mb-1 text-surface-dark/80 dark:text-surface-light/80">
-                      Job Role <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="jobRole"
-                      name="jobRole"
-                      value={formData.jobRole}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 bg-surface-light/10 dark:bg-surface-dark/10 border border-surface-light/20 dark:border-surface-dark/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-dark/50 dark:focus:ring-accent-light/50 text-surface-dark dark:text-surface-light"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="contactEmail" className="block text-sm font-medium mb-1 text-surface-dark/80 dark:text-surface-light/80">
-                      Contact Email <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      id="contactEmail"
-                      name="contactEmail"
-                      value={formData.contactEmail}
-                      onChange={(e) => {
-                        handleChange(e);
-                      }}
-                      onBlur={(e) => {
-                        const email = e.target.value;
-                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                        if (email && !emailRegex.test(email)) {
-                          setError('Please enter a valid email address.');
-                        } else {
-                          setError('');
-                        }
-                      }}
-                      required
-                      className="w-full px-4 py-2 bg-surface-light/10 dark:bg-surface-dark/10 border border-surface-light/20 dark:border-surface-dark/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-dark/50 dark:focus:ring-accent-light/50 text-surface-dark dark:text-surface-light"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="contactPhone" className="block text-sm font-medium mb-1 text-surface-dark/80 dark:text-surface-light/80">
-                      Contact Phone
-                    </label>
-                    <input
-                      type="tel"
-                      id="contactPhone"
-                      name="contactPhone"
-                      value={formData.contactPhone}
-                      onChange={(e) => {
-                        const onlyNums = e.target.value.replace(/\D/g, '');
-                        handleChange({
-                          ...e,
-                          target: {
-                            ...e.target,
-                            name: 'contactPhone',
-                            value: onlyNums
-                          }
-                        });
-                      }}
-                      inputMode="numeric"
-                      pattern="[0-9]{7,15}"
-                      required
-                      className="w-full px-4 py-2 bg-surface-light/10 dark:bg-surface-dark/10 border border-surface-light/20 dark:border-surface-dark/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-dark/50 dark:focus:ring-accent-light/50 text-surface-dark dark:text-surface-light"
-                    />
-                  </div>
-                </motion.div>
-              )}
-              
-              {/* Step 2: Business Information */}
-              {currentStep === 2 && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6"
-                >
-                  <h2 className="text-xl font-medium mb-4 text-surface-dark dark:text-surface-light">Business Information</h2>
-                  
-                  <div>
-                    <label htmlFor="companySize" className="block text-sm font-medium mb-1 text-surface-dark/80 dark:text-surface-light/80">
-                      Company Size <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      id="companySize"
-                      name="companySize"
-                      value={formData.companySize}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 bg-surface-light/10 dark:bg-surface-dark/10 border border-surface-light/20 dark:border-surface-dark/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-dark/50 dark:focus:ring-accent-light/50 text-surface-dark dark:text-surface-light"
-                    >
-                      <option value="">Select company size</option>
-                      <option value="1-10">1-10 employees</option>
-                      <option value="11-50">11-50 employees</option>
-                      <option value="51-200">51-200 employees</option>
-                      <option value="201-500">201-500 employees</option>
-                      <option value="501-1000">501-1000 employees</option>
-                      <option value="1000+">1000+ employees</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="industry" className="block text-sm font-medium mb-1 text-surface-dark/80 dark:text-surface-light/80">
-                      Industry <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      id="industry"
-                      name="industry"
-                      value={formData.industry}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2 bg-surface-light/10 dark:bg-surface-dark/10 border border-surface-light/20 dark:border-surface-dark/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-dark/50 dark:focus:ring-accent-light/50 text-surface-dark dark:text-surface-light"
-                    >
-                      <option value="">Select industry</option>
-                      <option value="Technology">Technology</option>
-                      <option value="Finance">Finance</option>
-                      <option value="Healthcare">Healthcare</option>
-                      <option value="Retail">Retail</option>
-                      <option value="Manufacturing">Manufacturing</option>
-                      <option value="Education">Education</option>
-                      <option value="Government">Government</option>
-                      <option value="Energy">Energy</option>
-                      <option value="Transportation">Transportation</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                </motion.div>
-              )}
-              
-              {/* Step 3: Audit Services */}
-              {currentStep === 3 && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6"
-                >
-                  <h2 className="text-xl font-medium mb-4 text-surface-dark dark:text-surface-light">Select Audit Services</h2>
-                  <p className="text-surface-dark/70 dark:text-surface-light/70 mb-6">
-                    Choose the security audit services you're interested in. You can select multiple options.
-                  </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="glass-card hover:border-accent-dark dark:hover:border-accent-light transition-colors cursor-pointer">
-                      <label className="flex items-start cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.auditServices.includes('network')}
-                          onChange={() => handleServiceChange('network')}
-                          className="h-5 w-5 text-accent-dark dark:text-accent-light rounded border-surface-light/20 dark:border-surface-dark/20 focus:ring-accent-dark dark:focus:ring-accent-light bg-surface-light/10 dark:bg-surface-dark/10 mt-1"
-                        />
-                        <div className="ml-3">
-                          <div className="flex items-center">
-                            <Server className="h-5 w-5 text-accent-dark dark:text-accent-light mr-2" />
-                            <span className="font-medium">Network Audit</span>
-                          </div>
-                          <p className="text-sm text-surface-dark/70 dark:text-surface-light/70 mt-1">
-                            Comprehensive assessment of your network infrastructure and security.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                    
-                    <div className="glass-card hover:border-accent-dark dark:hover:border-accent-light transition-colors cursor-pointer">
-                      <label className="flex items-start cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.auditServices.includes('web')}
-                          onChange={() => handleServiceChange('web')}
-                          className="h-5 w-5 text-accent-dark dark:text-accent-light rounded border-surface-light/20 dark:border-surface-dark/20 focus:ring-accent-dark dark:focus:ring-accent-light bg-surface-light/10 dark:bg-surface-dark/10 mt-1"
-                        />
-                        <div className="ml-3">
-                          <div className="flex items-center">
-                            <Globe className="h-5 w-5 text-green-500 dark:text-green-400 mr-2" />
-                            <span className="font-medium">Web App Audit</span>
-                          </div>
-                          <p className="text-sm text-surface-dark/70 dark:text-surface-light/70 mt-1">
-                            Security assessment of your web applications and APIs.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                    
-                    <div className="glass-card hover:border-accent-dark dark:hover:border-accent-light transition-colors cursor-pointer">
-                      <label className="flex items-start cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.auditServices.includes('cloud')}
-                          onChange={() => handleServiceChange('cloud')}
-                          className="h-5 w-5 text-accent-dark dark:text-accent-light rounded border-surface-light/20 dark:border-surface-dark/20 focus:ring-accent-dark dark:focus:ring-accent-light bg-surface-light/10 dark:bg-surface-dark/10 mt-1"
-                        />
-                        <div className="ml-3">
-                          <div className="flex items-center">
-                            <Cloud className="h-5 w-5 text-blue-500 dark:text-blue-400 mr-2" />
-                            <span className="font-medium">Cloud Audit</span>
-                          </div>
-                          <p className="text-sm text-surface-dark/70 dark:text-surface-light/70 mt-1">
-                            Security assessment of your cloud infrastructure and configurations.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                    
-                    <div className="glass-card hover:border-accent-dark dark:hover:border-accent-light transition-colors cursor-pointer">
-                      <label className="flex items-start cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.auditServices.includes('mobile')}
-                          onChange={() => handleServiceChange('mobile')}
-                          className="h-5 w-5 text-accent-dark dark:text-accent-light rounded border-surface-light/20 dark:border-surface-dark/20 focus:ring-accent-dark dark:focus:ring-accent-light bg-surface-light/10 dark:bg-surface-dark/10 mt-1"
-                        />
-                        <div className="ml-3">
-                          <div className="flex items-center">
-                            <Smartphone className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-2" />
-                            <span className="font-medium">Mobile Audit</span>
-                          </div>
-                          <p className="text-sm text-surface-dark/70 dark:text-surface-light/70 mt-1">
-                            Security assessment of your mobile applications.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                    
-                    <div className="glass-card hover:border-accent-dark dark:hover:border-accent-light transition-colors cursor-pointer">
-                      <label className="flex items-start cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.auditServices.includes('iot')}
-                          onChange={() => handleServiceChange('iot')}
-                          className="h-5 w-5 text-accent-dark dark:text-accent-light rounded border-surface-light/20 dark:border-surface-dark/20 focus:ring-accent-dark dark:focus:ring-accent-light bg-surface-light/10 dark:bg-surface-dark/10 mt-1"
-                        />
-                        <div className="ml-3">
-                          <div className="flex items-center">
-                            <Cpu className="h-5 w-5 text-red-500 dark:text-red-400 mr-2" />
-                            <span className="font-medium">IoT Audit</span>
-                          </div>
-                          <p className="text-sm text-surface-dark/70 dark:text-surface-light/70 mt-1">
-                            Security assessment of your IoT devices and infrastructure.
-                          </p>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="additionalDetails" className="block text-sm font-medium mb-1 text-surface-dark/80 dark:text-surface-light/80">
-                      Additional Details
-                    </label>
-                    <textarea
-                      id="additionalDetails"
-                      name="additionalDetails"
-                      value={formData.additionalDetails}
-                      onChange={handleChange}
-                      rows={4}
-                      className="w-full px-4 py-2 bg-surface-light/10 dark:bg-surface-dark/10 border border-surface-light/20 dark:border-surface-dark/20 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-dark/50 dark:focus:ring-accent-light/50 text-surface-dark dark:text-surface-light"
-                      placeholder="Please provide any additional information about your security requirements..."
-                    ></textarea>
-                  </div>
-                </motion.div>
-              )}
-              
-              {/* Step 4: Review */}
-              {currentStep === 4 && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6"
-                >
-                  <h2 className="text-xl font-medium mb-4 text-surface-dark dark:text-surface-light">Review Your Information</h2>
-                  <p className="text-surface-dark/70 dark:text-surface-light/70 mb-6">
-                    Please review your information before submitting.
-                  </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="glass-card p-4 rounded-lg">
-                      <h3 className="font-medium mb-3 flex items-center text-surface-dark dark:text-surface-light">
-                        <Shield className="h-5 w-5 text-accent-dark dark:text-accent-light mr-2" />
-                        Company Details
-                      </h3>
-                      <ul className="space-y-2 text-surface-dark/80 dark:text-surface-light/80">
-                        <li><span className="text-surface-dark/60 dark:text-surface-light/60">Company:</span> {formData.companyName}</li>
-                        <li><span className="text-surface-dark/60 dark:text-surface-light/60">Contact:</span> {formData.contactName}</li>
-                        <li><span className="text-surface-dark/60 dark:text-surface-light/60">Job Role:</span> {formData.jobRole}</li>
-                        <li><span className="text-surface-dark/60 dark:text-surface-light/60">Email:</span> {formData.contactEmail}</li>
-                        <li><span className="text-surface-dark/60 dark:text-surface-light/60">Phone:</span> {formData.contactPhone}</li>
-                      </ul>
-                    </div>
-                    
-                    <div className="glass-card p-4 rounded-lg">
-                      <h3 className="font-medium mb-3 flex items-center text-surface-dark dark:text-surface-light">
-                        <Shield className="h-5 w-5 text-accent-dark dark:text-accent-light mr-2" />
-                        Business Information
-                      </h3>
-                      <ul className="space-y-2 text-surface-dark/80 dark:text-surface-light/80">
-                        <li><span className="text-surface-dark/60 dark:text-surface-light/60">Company Size:</span> {formData.companySize}</li>
-                        <li><span className="text-surface-dark/60 dark:text-surface-light/60">Industry:</span> {formData.industry}</li>
-                      </ul>
-                    </div>
-                  </div>
-                  
-                  <div className="glass-card p-4 rounded-lg">
-                    <h3 className="font-medium mb-3 flex items-center text-surface-dark dark:text-surface-light">
-                      <Shield className="h-5 w-5 text-accent-dark dark:text-accent-light mr-2" />
-                      Selected Audit Services
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                      Contact Information
                     </h3>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {formData.auditServices.map(service => {
-                        let icon;
-                        let color;
-                        let label;
-                        
-                        switch(service) {
-                          case 'network':
-                            icon = <Server className="h-4 w-4" />;
-                            color = 'bg-accent-dark/10 text-accent-dark dark:bg-accent-light/10 dark:text-accent-light';
-                            label = 'Network Audit';
-                            break;
-                          case 'web':
-                            icon = <Globe className="h-4 w-4" />;
-                            color = 'bg-green-500/10 text-green-500 dark:bg-green-400/10 dark:text-green-400';
-                            label = 'Web App Audit';
-                            break;
-                          case 'cloud':
-                            icon = <Cloud className="h-4 w-4" />;
-                            color = 'bg-blue-500/10 text-blue-500 dark:bg-blue-400/10 dark:text-blue-400';
-                            label = 'Cloud Audit';
-                            break;
-                          case 'mobile':
-                            icon = <Smartphone className="h-4 w-4" />;
-                            color = 'bg-yellow-500/10 text-yellow-500 dark:bg-yellow-400/10 dark:text-yellow-400';
-                            label = 'Mobile Audit';
-                            break;
-                          case 'iot':
-                            icon = <Cpu className="h-4 w-4" />;
-                            color = 'bg-red-500/10 text-red-500 dark:bg-red-400/10 dark:text-red-400';
-                            label = 'IoT Audit';
-                            break;
-                          default:
-                            icon = <Shield className="h-4 w-4" />;
-                            color = 'bg-accent-dark/10 text-accent-dark dark:bg-accent-light/10 dark:text-accent-light';
-                            label = service;
-                        }
-                        
-                        return (
-                          <span key={service} className={`px-3 py-1 rounded-full flex items-center ${color}`}>
-                            {icon}
-                            <span className="ml-2">{label}</span>
-                          </span>
-                        );
-                      })}
-                    </div>
-                    
-                    {formData.additionalDetails && (
-                      <div>
-                        <h4 className="text-sm font-medium mb-2 text-surface-dark/80 dark:text-surface-light/80">Additional Details:</h4>
-                        <p className="text-surface-dark/70 dark:text-surface-light/70">{formData.additionalDetails}</p>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Name:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {formData.contactName}
+                        </span>
                       </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Email:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {formData.contactEmail}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Phone:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {formData.contactPhone}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Company:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {formData.companyName}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                      Schedule & Budget
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Start Date:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {formData.preferredStartDate}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Budget:</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {formData.budget}
+                        </span>
+                      </div>
+                      {formData.methodology && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-400">Methodology:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {formData.methodology}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                      Description
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                      {formData.description}
+                    </p>
+                    {formData.additionalRequirements && (
+                      <>
+                        <h4 className="text-md font-medium text-gray-900 dark:text-white mt-4 mb-2">
+                          Additional Requirements
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                          {formData.additionalRequirements}
+                        </p>
+                      </>
                     )}
                   </div>
-                  
-                  <div className="bg-surface-light/10 dark:bg-surface-dark/10 p-4 rounded-lg border border-surface-light/20 dark:border-surface-dark/20">
-                    <div className="flex items-start mb-4">
-                      <Lock className="h-5 w-5 text-accent-dark dark:text-accent-light mr-3 shrink-0 mt-0.5" />
-                      <p className="text-surface-dark/80 dark:text-surface-light/80">
-                        Your information will be securely stored using our proprietary technology.
-                        This ensures data integrity throughout the audit process.
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="consent"
-                        required
-                        className="h-4 w-4 text-accent-dark dark:text-accent-light border-surface-light/20 dark:border-surface-dark/20 rounded focus:ring-accent-dark dark:focus:ring-accent-light bg-surface-light/10 dark:bg-surface-dark/10"
-                      />
-                      <label htmlFor="consent" className="ml-2 text-sm text-surface-dark/80 dark:text-surface-light/80">
-                        I agree to the processing of my data as described in the{' '}
-                        <a href="#" className="text-accent-dark dark:text-accent-light hover:opacity-80">Privacy Policy</a>
-                      </label>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-              
-              {/* Navigation Buttons */}
-              <div className="mt-8 flex justify-between">
-                {currentStep > 1 && (
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="px-6 py-2 rounded-md bg-surface-light/20 dark:bg-surface-dark/20 text-surface-dark dark:text-surface-light hover:bg-surface-light/30 dark:hover:bg-surface-dark/30 transition-colors"
-                  >
-                    Back
-                  </button>
-                )}
-                
-                {currentStep < 4 ? (
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className="px-6 py-2 rounded-md bg-accent-dark dark:bg-accent-light text-white hover:bg-accent-dark/90 dark:hover:bg-accent-light/90 transition-colors ml-auto"
-                  >
-                    Next
-                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  if (currentStep === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background-light to-surface-light dark:from-background-dark dark:to-surface-dark">
+        <HeroSection />
+        <FeaturesSection />
+        <ServicesSection />
+        
+        <section className="py-20 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-3xl md:text-5xl font-display font-bold mb-6 bg-gradient-to-r from-secondary-dark to-accent-dark dark:from-secondary-light dark:to-accent-light bg-clip-text text-transparent">
+                Ready to Secure Your Business?
+              </h2>
+              <p className="text-lg md:text-xl text-text-secondary-light dark:text-text-secondary-dark mb-8 max-w-2xl mx-auto">
+                Start your security audit journey today. Our experts are ready to help protect your digital assets.
+              </p>
+              <motion.button
+                onClick={() => setCurrentStep(1)}
+                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-secondary-dark to-accent-dark dark:from-secondary-light dark:to-accent-light text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Get Started Now
+                <ArrowRight className="w-5 h-5" />
+              </motion.button>
+            </motion.div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background-light to-surface-light dark:from-background-dark dark:to-surface-dark py-12">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Progress Bar */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-4">
+            {[1, 2, 3, 4, 5].map((step) => (
+              <div
+                key={step}
+                className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${
+                  step <= currentStep
+                    ? 'bg-blue-500 border-blue-500 text-white'
+                    : 'border-gray-300 dark:border-gray-600 text-gray-400'
+                }`}
+              >
+                {step < currentStep ? (
+                  <CheckCircle className="w-6 h-6" />
                 ) : (
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`px-6 py-2 rounded-md bg-accent-dark dark:bg-accent-light text-white hover:bg-accent-dark/90 dark:hover:bg-accent-light/90 transition-colors ml-auto flex items-center ${
-                      isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg className="animate-spin h-5 w-5 text-white mr-2" viewBox="0 0 24 24">
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        Submit Request
-                      </>
-                    )}
-                  </button>
+                  <span className="font-semibold">{step}</span>
                 )}
               </div>
-            </form>
-          )}
-        </motion.div>
+            ))}
+          </div>
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${(currentStep / 5) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Step Content */}
+        <div className="bg-white/10 dark:bg-gray-800/30 backdrop-blur-xl rounded-2xl p-8 border border-white/20 dark:border-gray-700/30">
+          {renderStepContent()}
+
+          {/* Navigation Buttons */}
+          <div className="flex items-center justify-between mt-12">
+            <motion.button
+              onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+              className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+                currentStep === 1
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+              disabled={currentStep === 1}
+              whileHover={currentStep > 1 ? { scale: 1.02 } : {}}
+              whileTap={currentStep > 1 ? { scale: 0.98 } : {}}
+            >
+              Previous
+            </motion.button>
+
+            {currentStep < 5 ? (
+              <motion.button
+                onClick={() => setCurrentStep(currentStep + 1)}
+                className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  isStepValid()
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                    : 'opacity-50 cursor-not-allowed bg-gray-300 dark:bg-gray-600 text-gray-500'
+                }`}
+                disabled={!isStepValid()}
+                whileHover={isStepValid() ? { scale: 1.02 } : {}}
+                whileTap={isStepValid() ? { scale: 0.98 } : {}}
+              >
+                Next
+              </motion.button>
+            ) : (
+              <motion.button
+                onClick={handleSubmit}
+                disabled={!isStepValid() || isSubmitting}
+                className={`flex items-center gap-2 px-8 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  isStepValid() && !isSubmitting
+                    ? 'bg-green-500 hover:bg-green-600 text-white'
+                    : 'opacity-50 cursor-not-allowed bg-gray-300 dark:bg-gray-600 text-gray-500'
+                }`}
+                whileHover={isStepValid() && !isSubmitting ? { scale: 1.02 } : {}}
+                whileTap={isStepValid() && !isSubmitting ? { scale: 0.98 } : {}}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Submit Request
+                  </>
+                )}
+              </motion.button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

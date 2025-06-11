@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import DashboardLayout from '../../components/DashboardLayout';
 import {
   Search,
   Calendar,
@@ -19,8 +20,8 @@ import {
   Shield,
   Target
 } from 'lucide-react';
-import { mockProjects } from '../../data/mockProjects';
 import { useTheme } from '../../context/ThemeContext';
+import apiClient from '../../lib/api';
 
 const Projects: React.FC = () => {
   const { theme } = useTheme();
@@ -28,8 +29,32 @@ const Projects: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [projects] = useState(mockProjects);
-  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [projects, setProjects] = useState([]);
+  const [stats, setStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProjectsData();
+  }, []);
+
+  const fetchProjectsData = async () => {
+    try {
+      setLoading(true);
+      const [projectsRes, statsRes] = await Promise.all([
+        apiClient.get('/projects'),
+        apiClient.get('/projects/stats')
+      ]);
+
+      setProjects(projectsRes.data);
+      setStats(statsRes.data);
+    } catch (error) {
+      console.error('Failed to fetch projects data:', error);
+      setProjects([]);
+      setStats([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -57,7 +82,7 @@ const Projects: React.FC = () => {
     }
   };
 
-  const filteredProjects = projects.filter(({ name, client, type, status }) => {
+  const filteredProjects = projects.filter(({ name, client, type, status }: any) => {
     const matchesSearch =
       name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       client.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -73,41 +98,19 @@ const Projects: React.FC = () => {
     navigate(`/audit/${project.id}`);
   };
 
-  // Calculate stats
-  const stats = [
-    {
-      label: 'Total Projects',
-      value: projects.length.toString(),
-      change: '+3 this month',
-      icon: FolderOpen,
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      label: 'Active Projects',
-      value: projects.filter(p => p.status === 'in-progress').length.toString(),
-      change: '+2 this week',
-      icon: Clock,
-      color: 'from-orange-500 to-red-500'
-    },
-    {
-      label: 'Completed',
-      value: projects.filter(p => p.status === 'completed').length.toString(),
-      change: '+1 this week',
-      icon: CheckCircle,
-      color: 'from-green-500 to-emerald-500'
-    },
-    {
-      label: 'Avg. Score',
-      value: Math.round(projects.reduce((acc, p) => acc + p.score, 0) / projects.length).toString(),
-      change: '+5% improvement',
-      icon: TrendingUp,
-      color: 'from-purple-500 to-indigo-500'
-    }
-  ];
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-secondary-dark"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background-light to-surface-light dark:from-background-dark dark:to-surface-dark transition-all duration-500">
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
+    <DashboardLayout>
+      <div className="p-6 space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -126,6 +129,7 @@ const Projects: React.FC = () => {
             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            onClick={() => navigate('/get-started')}
           >
             <Plus className="w-5 h-5" />
             New Project
@@ -139,7 +143,7 @@ const Projects: React.FC = () => {
           transition={{ delay: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {stats.map((stat, index) => {
+          {stats.map((stat: any, index: number) => {
             const Icon = stat.icon;
             return (
               <motion.div
@@ -216,181 +220,167 @@ const Projects: React.FC = () => {
           transition={{ delay: 0.3 }}
           className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
         >
-          {filteredProjects.map((project: any, index) => {
-            const StatusIcon = getStatusIcon(project.status);
-            const ProjectIcon = project.icon;
-            const scoreValue = project.score ?? 0;
+          {filteredProjects.length > 0 ? (
+            filteredProjects.map((project: any, index: number) => {
+              const StatusIcon = getStatusIcon(project.status);
+              const ProjectIcon = project.icon;
+              const scoreValue = project.score ?? 0;
 
-            return (
-              <motion.div
-                key={project.id}
-                className="group relative bg-white/10 dark:bg-gray-800/30 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 hover:bg-white/20 dark:hover:bg-gray-800/50 transition-all duration-300 cursor-pointer overflow-hidden"
-                whileHover={{ scale: 1.02, y: -4 }}
-                onClick={() => handleProjectClick(project)}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + index * 0.1 }}
-              >
-                {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
-                {/* Project Header */}
-                <div className="relative z-10 flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3 min-w-0 flex-1">
-                    <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300">
-                      <ProjectIcon className="w-6 h-6" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
-                        {project.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{project.client}</p>
-                    </div>
-                  </div>
-                  <button className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <MoreVertical className="w-4 h-4 text-gray-400" />
-                  </button>
-                </div>
-
-                {/* Project Details */}
-                <div className="relative z-10 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Type</span>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">{project.type}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
-                    <div className="flex items-center space-x-2">
-                      <StatusIcon className={`w-4 h-4 ${getStatusColor(project.status).split(' ')[0]}`} />
-                      <span className={`text-sm font-medium px-2 py-1 rounded-full ${getStatusColor(project.status)}`}>
-                        {project.status.replace('-', ' ')}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Date</span>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {new Date(project.date).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Security Score</span>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-20 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <motion.div
-                          className={`h-full transition-all duration-500 ${
-                            scoreValue >= 90 ? 'bg-green-500' : scoreValue >= 70 ? 'bg-yellow-500' : 'bg-red-500'
-                          }`}
-                          initial={{ width: 0 }}
-                          animate={{ width: `${scoreValue}%` }}
-                          transition={{ delay: 0.5 + index * 0.1, duration: 0.8 }}
-                        />
+              return (
+                <motion.div
+                  key={project.id}
+                  className="group relative bg-white/10 dark:bg-gray-800/30 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 hover:bg-white/20 dark:hover:bg-gray-800/50 transition-all duration-300 cursor-pointer overflow-hidden"
+                  whileHover={{ scale: 1.02, y: -4 }}
+                  onClick={() => handleProjectClick(project)}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + index * 0.1 }}
+                >
+                  {/* Project content */}
+                  <div className="relative z-10">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center space-x-3 min-w-0 flex-1">
+                        <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300">
+                          <ProjectIcon className="w-6 h-6" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                            {project.name}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{project.client}</p>
+                        </div>
                       </div>
-                      <span className="text-sm font-bold text-gray-900 dark:text-white min-w-[35px]">{scoreValue}%</span>
+                      <button className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                        <MoreVertical className="w-4 h-4 text-gray-400" />
+                      </button>
                     </div>
-                  </div>
-                </div>
 
-                {/* Vulnerabilities Summary */}
-                <div className="relative z-10 mt-6 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Vulnerabilities Found</span>
-                    <span className="text-xs font-medium text-gray-900 dark:text-white">
-                      {Object.values(project.vulnerabilities).reduce((a: number, b: number) => a + b, 0)} total
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                      <span className="text-gray-600 dark:text-gray-400">{project.vulnerabilities.critical}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                      <span className="text-gray-600 dark:text-gray-400">{project.vulnerabilities.high}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                      <span className="text-gray-600 dark:text-gray-400">{project.vulnerabilities.medium}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-gray-600 dark:text-gray-400">{project.vulnerabilities.low}</span>
-                    </div>
-                  </div>
-                </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Type</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">{project.type}</span>
+                      </div>
 
-                {/* Hover Actions */}
-                <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-white/90 to-transparent dark:from-gray-800/90 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-b-2xl">
-                  <div className="flex space-x-2">
-                    <motion.button
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors duration-200"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleProjectClick(project);
-                      }}
-                    >
-                      <Eye className="w-4 h-4" />
-                      View Details
-                    </motion.button>
-                    <motion.button
-                      className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Download className="w-4 h-4" />
-                    </motion.button>
-                  </div>
-                </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
+                        <div className="flex items-center space-x-2">
+                          <StatusIcon className={`w-4 h-4 ${getStatusColor(project.status).split(' ')[0]}`} />
+                          <span className={`text-sm font-medium px-2 py-1 rounded-full ${getStatusColor(project.status)}`}>
+                            {project.status.replace('-', ' ')}
+                          </span>
+                        </div>
+                      </div>
 
-                {/* Progress indicator for in-progress projects */}
-                {project.status === 'in-progress' && (
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-t-2xl overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-blue-500 to-cyan-500"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${scoreValue}%` }}
-                      transition={{ delay: 0.5 + index * 0.1, duration: 1 }}
-                    />
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Date</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {new Date(project.date).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Security Score</span>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-20 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <motion.div
+                              className={`h-full transition-all duration-500 ${
+                                scoreValue >= 90 ? 'bg-green-500' : scoreValue >= 70 ? 'bg-yellow-500' : 'bg-red-500'
+                              }`}
+                              initial={{ width: 0 }}
+                              animate={{ width: `${scoreValue}%` }}
+                              transition={{ delay: 0.5 + index * 0.1, duration: 0.8 }}
+                            />
+                          </div>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white min-w-[35px]">{scoreValue}%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Vulnerabilities Summary */}
+                    <div className="mt-6 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs text-gray-600 dark:text-gray-400">Vulnerabilities Found</span>
+                        <span className="text-xs font-medium text-gray-900 dark:text-white">
+                          {Object.values(project.vulnerabilities || {}).reduce((a: number, b: number) => a + b, 0)} total
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <div className="flex items-center space-x-1">
+                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                          <span className="text-gray-600 dark:text-gray-400">{project.vulnerabilities?.critical || 0}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                          <span className="text-gray-600 dark:text-gray-400">{project.vulnerabilities?.high || 0}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                          <span className="text-gray-600 dark:text-gray-400">{project.vulnerabilities?.medium || 0}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span className="text-gray-600 dark:text-gray-400">{project.vulnerabilities?.low || 0}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </motion.div>
-            );
-          })}
+
+                  {/* Hover Actions */}
+                  <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-white/90 to-transparent dark:from-gray-800/90 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-b-2xl">
+                    <div className="flex space-x-2">
+                      <motion.button
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors duration-200"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleProjectClick(project);
+                        }}
+                      >
+                        <Eye className="w-4 h-4" />
+                        View Details
+                      </motion.button>
+                      <motion.button
+                        className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Download className="w-4 h-4" />
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="col-span-full text-center py-16"
+            >
+              <div className="bg-white/10 dark:bg-gray-800/30 backdrop-blur-xl rounded-2xl p-12 border border-white/20 dark:border-gray-700/30 max-w-md mx-auto">
+                <FolderOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No projects found</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Try adjusting your search or filter criteria, or create a new project to get started.
+                </p>
+                <motion.button
+                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 mx-auto"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => navigate('/get-started')}
+                >
+                  <Plus className="w-5 h-5" />
+                  Create New Project
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
-
-        {/* Empty State */}
-        {filteredProjects.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-center py-16"
-          >
-            <div className="bg-white/10 dark:bg-gray-800/30 backdrop-blur-xl rounded-2xl p-12 border border-white/20 dark:border-gray-700/30 max-w-md mx-auto">
-              <FolderOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No projects found</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Try adjusting your search or filter criteria, or create a new project to get started.
-              </p>
-              <motion.button
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 mx-auto"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Plus className="w-5 h-5" />
-                Create New Project
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

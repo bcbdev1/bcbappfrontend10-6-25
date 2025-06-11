@@ -1,6 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import OTPVerificationPage from './pages/OTPVerificationPage';
@@ -14,13 +14,12 @@ import AdminDashboard from './pages/Dashboard/AdminDashboard';
 import TestingDashboard from './pages/Dashboard/TestingDashboard';
 import AuditDetailsPage from './pages/AuditDetailsPage';
 import { useTheme } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
 import CursorEffect from './components/effects/CursorEffect';
-
 
 function App() {
   const location = useLocation();
   const { theme } = useTheme();
- 
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -31,26 +30,28 @@ function App() {
   }, [theme]);
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-background-dark text-text-dark' : 'bg-gray-300 text-text-light'} transition-colors duration-300`}>
-      <CursorEffect />
-      
-      <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/verify" element={<OTPVerificationPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/get-started" element={<GetStarted />} />
-            <Route path="/dashboard" element={<Dashboard />} /> 
-            <Route path="/help" element={<Help />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/testing" element={<TestingDashboard />} />
-            <Route path="/audit/:id" element={<AuditDetailsPage />} />
-          </Routes>
-      </AnimatePresence>
-    </div>
+    <AuthProvider>
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-background-dark text-text-dark' : 'bg-gray-300 text-text-light'} transition-colors duration-300`}>
+        <CursorEffect />
+        
+        <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/verify" element={<OTPVerificationPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/get-started" element={<GetStarted />} />
+              <Route path="/dashboard" element={<Dashboard />} /> 
+              <Route path="/help" element={<Help />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/testing" element={<TestingDashboard />} />
+              <Route path="/audit/:id" element={<AuditDetailsPage />} />
+            </Routes>
+        </AnimatePresence>
+      </div>
+    </AuthProvider>
   );
 }
 
