@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import router from './routes/auth.routes';
+import authRouter from './routes/auth.routes';
+import dashboardRouter from './routes/dashboard.routes';
 import sequelize from './config/db';
 import User from './models/User.model';
 import OTP from './models/OTP.model';
@@ -26,7 +27,8 @@ app.use(cors({
 // app.use(morgan('dev'));
 
 // ✅ Routes
-app.use('/api/auth', router);
+app.use('/api/auth', authRouter);
+app.use('/api/dashboard', dashboardRouter);
 
 // ✅ Sync DB and Start Server
 const startServer = async () => {
