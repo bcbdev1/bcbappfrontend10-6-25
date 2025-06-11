@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import * THREE from 'three';
 import { FontLoader, Font } from 'three/examples/jsm/loaders/FontLoader';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler';
@@ -180,6 +180,12 @@ const ParticleSystem = ({ onComplete }: { onComplete: () => void }) => {
 
   useFrame(({ clock }) => {
     if (!pointsRef.current || !font) return;
+    
+    // Check if geometry and position attribute exist before updating
+    const geometry = pointsRef.current.geometry;
+    const positionAttribute = geometry.attributes.position;
+    if (!positionAttribute) return;
+    
     const time = clock.getElapsedTime();
     const lerpFactor = 0.07;
 
@@ -199,7 +205,7 @@ const ParticleSystem = ({ onComplete }: { onComplete: () => void }) => {
       positions[i3 + 2] += (tz - positions[i3 + 2]) * lerpFactor;
     }
 
-    pointsRef.current.geometry.attributes.position.needsUpdate = true;
+    positionAttribute.needsUpdate = true;
   });
 
   if (!font) return null;
