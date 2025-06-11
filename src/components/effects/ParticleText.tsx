@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import * THREE from 'three';
+import * as THREE from 'three';
 import { FontLoader, Font } from 'three/examples/jsm/loaders/FontLoader';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler';
