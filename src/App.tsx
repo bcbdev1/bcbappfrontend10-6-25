@@ -10,6 +10,9 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Help from './pages/Dashboard/Help'; 
 import Projects from './pages/Dashboard/Projects';
 import Settings from './pages/Dashboard/Settings';
+import AdminDashboard from './pages/Dashboard/AdminDashboard';
+import TestingDashboard from './pages/Dashboard/TestingDashboard';
+import AuditDetailsPage from './pages/AuditDetailsPage';
 import { useTheme } from './context/ThemeContext';
 import CursorEffect from './components/effects/CursorEffect';
 
@@ -42,6 +45,9 @@ function App() {
             <Route path="/help" element={<Help />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/testing" element={<TestingDashboard />} />
+            <Route path="/audit/:id" element={<AuditDetailsPage />} />
           </Routes>
       </AnimatePresence>
     </div>
