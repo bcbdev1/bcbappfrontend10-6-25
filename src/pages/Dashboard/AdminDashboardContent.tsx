@@ -20,70 +20,29 @@ import {
   Phone,
   Building,
   Globe,
-  DollarSign
+  DollarSign,
+  UserCheck
 } from 'lucide-react';
-
-interface AuditRequest {
-  id: string;
-  companyName: string;
-  contactName: string;
-  contactEmail: string;
-  contactPhone: string;
-  auditType: string;
-  targetUrl: string;
-  description: string;
-  budget: string;
-  preferredStartDate: string;
-  priority: 'low' | 'medium' | 'high';
-  status: 'pending' | 'approved' | 'rejected' | 'in-progress' | 'completed';
-  submittedAt: string;
-}
+import { useWorkflow } from '../../context/WorkflowContext';
 
 const AdminDashboardContent: React.FC = () => {
-  const [auditRequests, setAuditRequests] = useState<AuditRequest[]>([]);
-  const [filteredRequests, setFilteredRequests] = useState<AuditRequest[]>([]);
+  const { 
+    auditRequests, 
+    getPendingRequests, 
+    approveRequest, 
+    rejectRequest 
+  } = useWorkflow();
+  
+  const [filteredRequests, setFilteredRequests] = useState(auditRequests);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedRequest, setSelectedRequest] = useState<AuditRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [showDetails, setShowDetails] = useState(false);
-
-  // Mock data for now - replace with API call
-  useEffect(() => {
-    const mockRequests: AuditRequest[] = [
-      {
-        id: '1',
-        companyName: 'TechCorp Solutions',
-        contactName: 'John Smith',
-        contactEmail: 'john.smith@techcorp.com',
-        contactPhone: '+1 (555) 123-4567',
-        auditType: 'web',
-        targetUrl: 'https://techcorp.com',
-        description: 'Comprehensive web application security audit for our e-commerce platform',
-        budget: '$5,000 - $10,000',
-        preferredStartDate: '2024-02-15',
-        priority: 'high',
-        status: 'pending',
-        submittedAt: '2024-01-15T10:30:00Z'
-      },
-      {
-        id: '2',
-        companyName: 'StartupXYZ',
-        contactName: 'Sarah Johnson',
-        contactEmail: 'sarah@startupxyz.com',
-        contactPhone: '+1 (555) 987-6543',
-        auditType: 'network',
-        targetUrl: '192.168.1.0/24',
-        description: 'Network security assessment for our growing infrastructure',
-        budget: '$3,000 - $5,000',
-        preferredStartDate: '2024-02-20',
-        priority: 'medium',
-        status: 'approved',
-        submittedAt: '2024-01-12T14:20:00Z'
-      }
-    ];
-    setAuditRequests(mockRequests);
-    setFilteredRequests(mockRequests);
-  }, []);
+  const [availableTesters] = useState([
+    { id: 'tester-1', name: 'Security Expert Alpha', specialization: 'Web Applications' },
+    { id: 'tester-2', name: 'Security Expert Beta', specialization: 'Network Security' },
+    { id: 'tester-3', name: 'Security Expert Gamma', specialization: 'Mobile Applications' }
+  ]);
 
   useEffect(() => {
     let filtered = auditRequests;
@@ -103,28 +62,33 @@ const AdminDashboardContent: React.FC = () => {
     setFilteredRequests(filtered);
   }, [searchQuery, statusFilter, auditRequests]);
 
-  const handleStatusUpdate = (requestId: string, newStatus: 'approved' | 'rejected') => {
-    setAuditRequests(prev =>
-      prev.map(request =>
-        request.id === requestId ? { ...request, status: newStatus } : request
-      )
-    );
+  const handleApprove = (requestId: string, testerId: string) => {
+    approveRequest(requestId, testerId);
+    setShowDetails(false);
+  };
+
+  const handleReject = (requestId: string, reason: string) => {
+    rejectRequest(requestId, reason);
+    setShowDetails(false);
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30';
-      case 'approved': return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
+      case 'approved': 
+      case 'assigned': return 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30';
       case 'rejected': return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
-      case 'in-progress': return 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30';
-      case 'completed': return 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30';
+      case 'in-progress': 
+      case 'testing': return 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30';
+      case 'completed': return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
       default: return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/30';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
+      case 'critical': return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
+      case 'high': return 'text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30';
       case 'medium': return 'text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30';
       case 'low': return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
       default: return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/30';
@@ -141,21 +105,21 @@ const AdminDashboardContent: React.FC = () => {
     },
     {
       label: 'Pending Review',
-      value: auditRequests.filter(r => r.status === 'pending').length.toString(),
+      value: getPendingRequests().length.toString(),
       icon: Clock,
       color: 'warning',
       change: '+5%'
     },
     {
       label: 'Approved',
-      value: auditRequests.filter(r => r.status === 'approved').length.toString(),
+      value: auditRequests.filter(r => ['approved', 'assigned'].includes(r.status)).length.toString(),
       icon: CheckCircle,
       color: 'success',
       change: '+18%'
     },
     {
       label: 'Active Audits',
-      value: auditRequests.filter(r => r.status === 'in-progress').length.toString(),
+      value: auditRequests.filter(r => ['in-progress', 'testing', 'reporting'].includes(r.status)).length.toString(),
       icon: Shield,
       color: 'info',
       change: '+8%'
@@ -284,7 +248,7 @@ const AdminDashboardContent: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(request.status)}`}>
-                      {request.status}
+                      {request.status.replace('-', ' ')}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -304,13 +268,13 @@ const AdminDashboardContent: React.FC = () => {
                       {request.status === 'pending' && (
                         <>
                           <button
-                            onClick={() => handleStatusUpdate(request.id, 'approved')}
+                            onClick={() => handleApprove(request.id, 'tester-1')}
                             className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
                           >
                             <Check className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleStatusUpdate(request.id, 'rejected')}
+                            onClick={() => handleReject(request.id, 'Requirements not met')}
                             className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                           >
                             <X className="w-4 h-4" />
@@ -337,7 +301,7 @@ const AdminDashboardContent: React.FC = () => {
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-6">
@@ -350,8 +314,9 @@ const AdminDashboardContent: React.FC = () => {
               </button>
             </div>
 
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Company Information */}
+              <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Company Information</h3>
                   <div className="space-y-3">
@@ -389,48 +354,77 @@ const AdminDashboardContent: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Audit Details</h3>
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                  <p className="text-gray-900 dark:text-white">{selectedRequest.description}</p>
+              {/* Audit Details */}
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Audit Details</h3>
+                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                    <p className="text-gray-900 dark:text-white mb-4">{selectedRequest.description}</p>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600 dark:text-gray-400">Type:</span>
+                        <span className="ml-2 capitalize text-gray-900 dark:text-white">{selectedRequest.auditType}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600 dark:text-gray-400">Priority:</span>
+                        <span className="ml-2 capitalize text-gray-900 dark:text-white">{selectedRequest.priority}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600 dark:text-gray-400">Duration:</span>
+                        <span className="ml-2 text-gray-900 dark:text-white">{selectedRequest.estimatedDuration}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600 dark:text-gray-400">Start Date:</span>
+                        <span className="ml-2 text-gray-900 dark:text-white">{selectedRequest.preferredStartDate}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    Preferred Start: {new Date(selectedRequest.preferredStartDate).toLocaleDateString()}
-                  </span>
+                {selectedRequest.additionalRequirements && (
+                  <div>
+                    <h4 className="text-md font-medium text-gray-900 dark:text-white mb-2">Additional Requirements</h4>
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                      <p className="text-gray-900 dark:text-white text-sm">{selectedRequest.additionalRequirements}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {selectedRequest.status === 'pending' && (
+              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Assign Tester</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  {availableTesters.map((tester) => (
+                    <div
+                      key={tester.id}
+                      className="p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+                      onClick={() => handleApprove(selectedRequest.id, tester.id)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                          <UserCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900 dark:text-white">{tester.name}</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{tester.specialization}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getPriorityColor(selectedRequest.priority)}`}>
-                  {selectedRequest.priority} Priority
-                </span>
-              </div>
-
-              {selectedRequest.status === 'pending' && (
-                <div className="flex gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                
+                <div className="flex gap-4">
                   <button
-                    onClick={() => {
-                      handleStatusUpdate(selectedRequest.id, 'approved');
-                      setShowDetails(false);
-                    }}
-                    className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
-                  >
-                    Approve Request
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleStatusUpdate(selectedRequest.id, 'rejected');
-                      setShowDetails(false);
-                    }}
+                    onClick={() => handleReject(selectedRequest.id, 'Requirements not met')}
                     className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
                   >
                     Reject Request
                   </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}

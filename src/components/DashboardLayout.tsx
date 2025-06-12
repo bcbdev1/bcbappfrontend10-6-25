@@ -84,7 +84,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole = 
         return [
           ...baseItems,
           { id: 'projects', label: 'Projects', icon: FolderOpen, path: '/projects' },
-          { id: 'scan', label: 'Request Audit', icon: Scan, path: '/request-audit' },
+          { id: 'scan', label: 'Request Audit', icon: Scan, path: '/get-started' },
           { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
           { id: 'help', label: 'Help', icon: HelpCircle, path: '/help' }
         ];
@@ -470,7 +470,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole = 
                           <div>
                             <p className="font-medium">Test User</p>
                             <p className={`text-sm capitalize ${
-                              theme === 'dark' ? 'text-text-secondary-dark' : 'text-text-secondary-light'
+                              theme === 'dark'
+                                ? 'text-text-secondary-dark'
+                                : 'text-text-secondary-light'
                             }`}>
                               {userRole}
                             </p>
@@ -502,7 +504,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole = 
                         </button>
                       </div>
                       <div className={`p-2 border-t ${
-                        theme === 'dark' ? 'border-surface-secondary-dark/30' : 'border-gray-200'
+                        theme === 'dark'
+                          ? 'border-surface-secondary-dark/30'
+                          : 'border-gray-200'
                       }`}>
                         <button
                           onClick={handleLogout}

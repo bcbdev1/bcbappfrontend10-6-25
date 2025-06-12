@@ -19,81 +19,43 @@ import {
   Globe,
   Smartphone,
   Server,
-  Cloud
+  Cloud,
+  Plus,
+  Upload,
+  Save
 } from 'lucide-react';
-
-interface AssignedAudit {
-  id: string;
-  companyName: string;
-  auditType: string;
-  targetUrl: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high';
-  status: 'assigned' | 'in-progress' | 'testing' | 'reporting' | 'completed';
-  assignedAt: string;
-  deadline: string;
-  progress: number;
-  testingPhase: string;
-  vulnerabilitiesFound: {
-    critical: number;
-    high: number;
-    medium: number;
-    low: number;
-  };
-}
+import { useWorkflow } from '../../context/WorkflowContext';
 
 const TestingDashboardContent: React.FC = () => {
-  const [assignedAudits, setAssignedAudits] = useState<AssignedAudit[]>([]);
-  const [filteredAudits, setFilteredAudits] = useState<AssignedAudit[]>([]);
+  const { 
+    currentUser,
+    getTesterRequests, 
+    updateAuditStatus, 
+    addFinding, 
+    updateProgress, 
+    uploadDocument, 
+    generateReport 
+  } = useWorkflow();
+  
+  const [assignedAudits, setAssignedAudits] = useState(getTesterRequests('tester-1'));
+  const [filteredAudits, setFilteredAudits] = useState(assignedAudits);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedAudit, setSelectedAudit] = useState<AssignedAudit | null>(null);
+  const [selectedAudit, setSelectedAudit] = useState<any>(null);
+  const [showFindingModal, setShowFindingModal] = useState(false);
+  const [newFinding, setNewFinding] = useState({
+    title: '',
+    severity: 'medium' as const,
+    description: '',
+    impact: '',
+    recommendation: ''
+  });
 
-  // Mock data for now - replace with API call
   useEffect(() => {
-    const mockAudits: AssignedAudit[] = [
-      {
-        id: '1',
-        companyName: 'TechCorp Solutions',
-        auditType: 'web',
-        targetUrl: 'https://techcorp.com',
-        description: 'Comprehensive web application security audit for e-commerce platform',
-        priority: 'high',
-        status: 'in-progress',
-        assignedAt: '2024-01-20T09:00:00Z',
-        deadline: '2024-02-20T17:00:00Z',
-        progress: 65,
-        testingPhase: 'Vulnerability Assessment',
-        vulnerabilitiesFound: {
-          critical: 2,
-          high: 5,
-          medium: 8,
-          low: 12
-        }
-      },
-      {
-        id: '2',
-        companyName: 'StartupXYZ',
-        auditType: 'network',
-        targetUrl: '192.168.1.0/24',
-        description: 'Network security assessment for growing infrastructure',
-        priority: 'medium',
-        status: 'assigned',
-        assignedAt: '2024-01-22T10:30:00Z',
-        deadline: '2024-02-25T17:00:00Z',
-        progress: 0,
-        testingPhase: 'Planning',
-        vulnerabilitiesFound: {
-          critical: 0,
-          high: 0,
-          medium: 0,
-          low: 0
-        }
-      }
-    ];
-    setAssignedAudits(mockAudits);
-    setFilteredAudits(mockAudits);
-  }, []);
+    const testerAudits = getTesterRequests('tester-1');
+    setAssignedAudits(testerAudits);
+    setFilteredAudits(testerAudits);
+  }, [getTesterRequests]);
 
   useEffect(() => {
     let filtered = assignedAudits;
@@ -112,12 +74,85 @@ const TestingDashboardContent: React.FC = () => {
     setFilteredAudits(filtered);
   }, [searchQuery, statusFilter, assignedAudits]);
 
-  const updateAuditStatus = (auditId: string, newStatus: AssignedAudit['status']) => {
-    setAssignedAudits(prev =>
-      prev.map(audit =>
-        audit.id === auditId ? { ...audit, status: newStatus } : audit
-      )
-    );
+  const handleStatusUpdate = (auditId: string, newStatus: any) => {
+    let updates: any = {};
+    
+    switch (newStatus) {
+      case 'in-progress':
+        updates = { 
+          progress: 25, 
+          testingPhase: 'Information Gathering' 
+        };
+        break;
+      case 'testing':
+        updates = { 
+          progress: 50, 
+          testingPhase: 'Active Testing' 
+        };
+        break;
+      case 'reporting':
+        updates = { 
+          progress: 85, 
+          testingPhase: 'Report Generation' 
+        };
+        break;
+      case 'completed':
+        updates = { 
+          progress: 100, 
+          testingPhase: 'Completed' 
+        };
+        generateReport(auditId);
+        break;
+    }
+    
+    updateAuditStatus(auditId, newStatus, updates);
+    
+    // Refresh the local state
+    const updatedAudits = getTesterRequests('tester-1');
+    setAssignedAudits(updatedAudits);
+  };
+
+  const handleAddFinding = () => {
+    if (selectedAudit && newFinding.title && newFinding.description) {
+      addFinding(selectedAudit.id, newFinding);
+      setNewFinding({
+        title: '',
+        severity: 'medium',
+        description: '',
+        impact: '',
+        recommendation: ''
+      });
+      setShowFindingModal(false);
+      
+      // Refresh the local state
+      const updatedAudits = getTesterRequests('tester-1');
+      setAssignedAudits(updatedAudits);
+    }
+  };
+
+  const handleProgressUpdate = (auditId: string, progress: number, phase: string) => {
+    updateProgress(auditId, progress, phase);
+    
+    // Refresh the local state
+    const updatedAudits = getTesterRequests('tester-1');
+    setAssignedAudits(updatedAudits);
+  };
+
+  const handleDocumentUpload = (auditId: string) => {
+    const document = {
+      name: 'Evidence Screenshot.png',
+      type: 'PNG',
+      size: '1.2 MB',
+      category: 'evidence' as const,
+      downloadUrl: `/evidence/${auditId}/screenshot.png`,
+      status: 'ready' as const
+    };
+    
+    uploadDocument(auditId, document);
+    
+    // Refresh the local state
+    const updatedAudits = getTesterRequests('tester-1');
+    setAssignedAudits(updatedAudits);
   };
 
   const getStatusColor = (status: string) => {
@@ -133,7 +168,8 @@ const TestingDashboardContent: React.FC = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
+      case 'critical': return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
+      case 'high': return 'text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30';
       case 'medium': return 'text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30';
       case 'low': return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
       default: return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/30';
@@ -160,7 +196,7 @@ const TestingDashboardContent: React.FC = () => {
     },
     {
       label: 'In Progress',
-      value: assignedAudits.filter(a => a.status === 'in-progress').length.toString(),
+      value: assignedAudits.filter(a => ['in-progress', 'testing'].includes(a.status)).length.toString(),
       icon: Activity,
       color: 'warning',
       change: 'Active testing'
@@ -174,7 +210,7 @@ const TestingDashboardContent: React.FC = () => {
     },
     {
       label: 'Critical Issues',
-      value: assignedAudits.reduce((sum, audit) => sum + audit.vulnerabilitiesFound.critical, 0).toString(),
+      value: assignedAudits.reduce((sum, audit) => sum + audit.vulnerabilities.critical, 0).toString(),
       icon: AlertTriangle,
       color: 'error',
       change: 'Needs attention'
@@ -294,7 +330,7 @@ const TestingDashboardContent: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <Calendar className="w-4 h-4" />
-                  <span>Deadline: {new Date(audit.deadline).toLocaleDateString()}</span>
+                  <span>Assigned: {new Date(audit.submittedAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <Activity className="w-4 h-4" />
@@ -317,34 +353,30 @@ const TestingDashboardContent: React.FC = () => {
                 </div>
               )}
 
-              {audit.status !== 'assigned' && (
+              {audit.vulnerabilities.total > 0 && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Vulnerabilities Found</h4>
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-red-600 dark:text-red-400">{audit.vulnerabilitiesFound.critical}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">Critical</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-orange-600 dark:text-orange-400">{audit.vulnerabilitiesFound.high}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">High</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{audit.vulnerabilitiesFound.medium}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">Medium</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-green-600 dark:text-green-400">{audit.vulnerabilitiesFound.low}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">Low</div>
-                    </div>
+                  <div className="grid grid-cols-5 gap-2">
+                    {[
+                      { label: 'Critical', count: audit.vulnerabilities.critical, color: 'text-red-600' },
+                      { label: 'High', count: audit.vulnerabilities.high, color: 'text-orange-600' },
+                      { label: 'Medium', count: audit.vulnerabilities.medium, color: 'text-yellow-600' },
+                      { label: 'Low', count: audit.vulnerabilities.low, color: 'text-green-600' },
+                      { label: 'Info', count: audit.vulnerabilities.informational, color: 'text-blue-600' }
+                    ].map((vuln, i) => (
+                      <div key={i} className="text-center">
+                        <div className={`text-lg font-bold ${vuln.color}`}>{vuln.count}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">{vuln.label}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 mb-4">
                 {audit.status === 'assigned' && (
                   <button
-                    onClick={() => updateAuditStatus(audit.id, 'in-progress')}
+                    onClick={() => handleStatusUpdate(audit.id, 'in-progress')}
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
                   >
                     <Play className="w-4 h-4" />
@@ -352,22 +384,17 @@ const TestingDashboardContent: React.FC = () => {
                   </button>
                 )}
                 {audit.status === 'in-progress' && (
-                  <>
-                    <button
-                      onClick={() => updateAuditStatus(audit.id, 'testing')}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
-                    >
-                      <Activity className="w-4 h-4" />
-                      Begin Testing
-                    </button>
-                    <button className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
-                      <Pause className="w-4 h-4" />
-                    </button>
-                  </>
+                  <button
+                    onClick={() => handleStatusUpdate(audit.id, 'testing')}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
+                  >
+                    <Activity className="w-4 h-4" />
+                    Begin Testing
+                  </button>
                 )}
                 {audit.status === 'testing' && (
                   <button
-                    onClick={() => updateAuditStatus(audit.id, 'reporting')}
+                    onClick={() => handleStatusUpdate(audit.id, 'reporting')}
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
                   >
                     <FileText className="w-4 h-4" />
@@ -376,7 +403,7 @@ const TestingDashboardContent: React.FC = () => {
                 )}
                 {audit.status === 'reporting' && (
                   <button
-                    onClick={() => updateAuditStatus(audit.id, 'completed')}
+                    onClick={() => handleStatusUpdate(audit.id, 'completed')}
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
                   >
                     <CheckCircle className="w-4 h-4" />
@@ -390,6 +417,28 @@ const TestingDashboardContent: React.FC = () => {
                   </button>
                 )}
               </div>
+
+              {['in-progress', 'testing'].includes(audit.status) && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setSelectedAudit(audit);
+                      setShowFindingModal(true);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Finding
+                  </button>
+                  <button
+                    onClick={() => handleDocumentUpload(audit.id)}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Upload
+                  </button>
+                </div>
+              )}
             </motion.div>
           );
         })}
@@ -402,8 +451,114 @@ const TestingDashboardContent: React.FC = () => {
           className="text-center py-12"
         >
           <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No audits found</h3>
-          <p className="text-gray-600 dark:text-gray-400">No audits match your current filters</p>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No audits assigned</h3>
+          <p className="text-gray-600 dark:text-gray-400">Wait for admin to assign audits to you</p>
+        </motion.div>
+      )}
+
+      {/* Add Finding Modal */}
+      {showFindingModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowFindingModal(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add Security Finding</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Finding Title
+                </label>
+                <input
+                  type="text"
+                  value={newFinding.title}
+                  onChange={(e) => setNewFinding({...newFinding, title: e.target.value})}
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="e.g., SQL Injection in Login Form"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Severity
+                </label>
+                <select
+                  value={newFinding.severity}
+                  onChange={(e) => setNewFinding({...newFinding, severity: e.target.value as any})}
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="informational">Informational</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={newFinding.description}
+                  onChange={(e) => setNewFinding({...newFinding, description: e.target.value})}
+                  rows={3}
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                  placeholder="Describe the vulnerability..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Impact
+                </label>
+                <textarea
+                  value={newFinding.impact}
+                  onChange={(e) => setNewFinding({...newFinding, impact: e.target.value})}
+                  rows={2}
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                  placeholder="What could happen if exploited..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Recommendation
+                </label>
+                <textarea
+                  value={newFinding.recommendation}
+                  onChange={(e) => setNewFinding({...newFinding, recommendation: e.target.value})}
+                  rows={2}
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                  placeholder="How to fix this issue..."
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-4 mt-6">
+              <button
+                onClick={() => setShowFindingModal(false)}
+                className="flex-1 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddFinding}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+              >
+                <Save className="w-4 h-4" />
+                Add Finding
+              </button>
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Shield,
   Calendar,
@@ -26,168 +26,28 @@ import {
   LineChart,
   ArrowRight,
   ExternalLink,
-  RefreshCw
+  RefreshCw,
+  ArrowLeft
 } from 'lucide-react';
-
-interface AuditDetails {
-  id: string;
-  companyName: string;
-  auditType: string;
-  targetUrl: string;
-  status: string;
-  startDate: string;
-  endDate: string;
-  progress: number;
-  testingPhase: string;
-  methodology: string;
-  scope: string[];
-  vulnerabilities: {
-    critical: number;
-    high: number;
-    medium: number;
-    low: number;
-    informational: number;
-    total: number;
-  };
-  findings: Array<{
-    id: string;
-    title: string;
-    severity: 'critical' | 'high' | 'medium' | 'low' | 'informational';
-    description: string;
-    impact: string;
-    recommendation: string;
-    status: 'open' | 'fixed' | 'accepted' | 'false-positive';
-  }>;
-  documents: Array<{
-    id: string;
-    name: string;
-    type: string;
-    size: string;
-    uploadDate: string;
-    category: string;
-  }>;
-  timeline: Array<{
-    id: string;
-    phase: string;
-    status: 'completed' | 'in-progress' | 'pending';
-    startDate: string;
-    endDate?: string;
-    description: string;
-  }>;
-}
+import { useWorkflow } from '../context/WorkflowContext';
 
 const AuditDetailsContent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [auditDetails, setAuditDetails] = useState<AuditDetails | null>(null);
+  const navigate = useNavigate();
+  const { auditRequests, requestReaudit } = useWorkflow();
+  const [auditDetails, setAuditDetails] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock data - replace with API call
-    const mockAuditDetails: AuditDetails = {
-      id: id || '1',
-      companyName: 'TechCorp Solutions',
-      auditType: 'web',
-      targetUrl: 'https://techcorp.com',
-      status: 'in-progress',
-      startDate: '2024-01-15',
-      endDate: '2024-02-15',
-      progress: 75,
-      testingPhase: 'Vulnerability Assessment',
-      methodology: 'OWASP Testing Guide',
-      scope: ['Web Application', 'API Endpoints', 'Authentication System', 'Database Security'],
-      vulnerabilities: {
-        critical: 2,
-        high: 5,
-        medium: 8,
-        low: 12,
-        informational: 3,
-        total: 30
-      },
-      findings: [
-        {
-          id: '1',
-          title: 'SQL Injection in Login Form',
-          severity: 'critical',
-          description: 'The login form is vulnerable to SQL injection attacks through the username parameter.',
-          impact: 'Attackers could gain unauthorized access to the database and extract sensitive information.',
-          recommendation: 'Implement parameterized queries and input validation.',
-          status: 'open'
-        },
-        {
-          id: '2',
-          title: 'Cross-Site Scripting (XSS)',
-          severity: 'high',
-          description: 'Reflected XSS vulnerability found in the search functionality.',
-          impact: 'Attackers could execute malicious scripts in users\' browsers.',
-          recommendation: 'Implement proper output encoding and Content Security Policy.',
-          status: 'fixed'
-        }
-      ],
-      documents: [
-        {
-          id: '1',
-          name: 'Vulnerability Assessment Report',
-          type: 'PDF',
-          size: '2.4 MB',
-          uploadDate: '2024-01-20',
-          category: 'report'
-        },
-        {
-          id: '2',
-          name: 'Executive Summary',
-          type: 'PDF',
-          size: '856 KB',
-          uploadDate: '2024-01-22',
-          category: 'summary'
-        }
-      ],
-      timeline: [
-        {
-          id: '1',
-          phase: 'Planning & Scoping',
-          status: 'completed',
-          startDate: '2024-01-15',
-          endDate: '2024-01-17',
-          description: 'Define audit scope and methodology'
-        },
-        {
-          id: '2',
-          phase: 'Information Gathering',
-          status: 'completed',
-          startDate: '2024-01-18',
-          endDate: '2024-01-22',
-          description: 'Reconnaissance and asset discovery'
-        },
-        {
-          id: '3',
-          phase: 'Vulnerability Assessment',
-          status: 'in-progress',
-          startDate: '2024-01-23',
-          description: 'Active testing and vulnerability identification'
-        },
-        {
-          id: '4',
-          phase: 'Exploitation & Validation',
-          status: 'pending',
-          startDate: '2024-02-01',
-          description: 'Validate findings and assess impact'
-        },
-        {
-          id: '5',
-          phase: 'Reporting',
-          status: 'pending',
-          startDate: '2024-02-10',
-          description: 'Generate comprehensive audit report'
-        }
-      ]
-    };
-
-    setTimeout(() => {
-      setAuditDetails(mockAuditDetails);
+    if (id) {
+      const audit = auditRequests.find(a => a.id === id);
+      if (audit) {
+        setAuditDetails(audit);
+      }
       setLoading(false);
-    }, 1000);
-  }, [id]);
+    }
+  }, [id, auditRequests]);
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -222,6 +82,23 @@ const AuditDetailsContent: React.FC = () => {
     }
   };
 
+  const handleDownload = (document: any) => {
+    // In a real app, this would trigger an actual download
+    alert(`Downloading ${document.name}`);
+  };
+
+  const handleReaudit = () => {
+    if (auditDetails) {
+      const updates = {
+        description: `Re-audit requested for ${auditDetails.companyName} - Follow-up security assessment`,
+        additionalRequirements: 'Follow-up audit to verify fixes and identify new vulnerabilities'
+      };
+      requestReaudit(auditDetails.id, updates);
+      alert('Re-audit request submitted successfully!');
+      navigate('/dashboard');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -237,6 +114,12 @@ const AuditDetailsContent: React.FC = () => {
           <AlertTriangle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Audit Not Found</h2>
           <p className="text-gray-600 dark:text-gray-400">The requested audit could not be found.</p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Back to Dashboard
+          </button>
         </div>
       </div>
     );
@@ -246,6 +129,17 @@ const AuditDetailsContent: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Back Button */}
+      <motion.button
+        onClick={() => navigate('/dashboard')}
+        className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to Dashboard
+      </motion.button>
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -267,13 +161,17 @@ const AuditDetailsContent: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <Calendar className="w-4 h-4" />
-                  <span>{new Date(auditDetails.startDate).toLocaleDateString()} - {new Date(auditDetails.endDate).toLocaleDateString()}</span>
+                  <span>Submitted: {new Date(auditDetails.submittedAt).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
           </div>
           <div className="text-right">
-            <span className="px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 capitalize">
+            <span className={`px-4 py-2 rounded-full text-sm font-medium capitalize ${
+              auditDetails.status === 'completed' ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' :
+              auditDetails.status === 'in-progress' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
+              'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400'
+            }`}>
               {auditDetails.status.replace('-', ' ')}
             </span>
             <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -370,23 +268,22 @@ const AuditDetailsContent: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Methodology</label>
-                  <p className="text-gray-900 dark:text-white">{auditDetails.methodology}</p>
+                  <p className="text-gray-900 dark:text-white">{auditDetails.methodology || 'OWASP Testing Guide'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Scope</label>
-                  <div className="mt-1 space-y-1">
-                    {auditDetails.scope.map((item, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                        <span className="text-sm text-gray-900 dark:text-white">{item}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Priority</label>
+                  <p className="text-gray-900 dark:text-white capitalize">{auditDetails.priority}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Current Phase</label>
                   <p className="text-gray-900 dark:text-white">{auditDetails.testingPhase}</p>
                 </div>
+                {auditDetails.assignedTester && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Assigned Tester</label>
+                    <p className="text-gray-900 dark:text-white">{auditDetails.assignedTester}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -394,37 +291,45 @@ const AuditDetailsContent: React.FC = () => {
 
         {activeTab === 'findings' && (
           <div className="space-y-4">
-            {auditDetails.findings.map((finding) => (
-              <div key={finding.id} className="bg-white/10 dark:bg-gray-800/30 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{finding.title}</h3>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getSeverityColor(finding.severity)}`}>
-                        {finding.severity}
-                      </span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(finding.status)}`}>
-                        {finding.status.replace('-', ' ')}
-                      </span>
+            {auditDetails.findings.length > 0 ? (
+              auditDetails.findings.map((finding: any) => (
+                <div key={finding.id} className="bg-white/10 dark:bg-gray-800/30 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{finding.title}</h3>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getSeverityColor(finding.severity)}`}>
+                          {finding.severity}
+                        </span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(finding.status)}`}>
+                          {finding.status.replace('-', ' ')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">Description</h4>
+                      <p className="text-gray-600 dark:text-gray-400">{finding.description}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">Impact</h4>
+                      <p className="text-gray-600 dark:text-gray-400">{finding.impact}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">Recommendation</h4>
+                      <p className="text-gray-600 dark:text-gray-400">{finding.recommendation}</p>
                     </div>
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Description</h4>
-                    <p className="text-gray-600 dark:text-gray-400">{finding.description}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Impact</h4>
-                    <p className="text-gray-600 dark:text-gray-400">{finding.impact}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Recommendation</h4>
-                    <p className="text-gray-600 dark:text-gray-400">{finding.recommendation}</p>
-                  </div>
-                </div>
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No findings yet</h3>
+                <p className="text-gray-600 dark:text-gray-400">Findings will appear here as the audit progresses</p>
               </div>
-            ))}
+            )}
           </div>
         )}
 
@@ -432,33 +337,44 @@ const AuditDetailsContent: React.FC = () => {
           <div className="bg-white/10 dark:bg-gray-800/30 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Audit Documents</h2>
             <div className="space-y-4">
-              {auditDetails.documents.map((doc) => (
-                <div key={doc.id} className="flex items-center justify-between p-4 border border-gray-200/50 dark:border-gray-700/50 rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 rounded-lg bg-blue-500/20 text-blue-600 dark:text-blue-400">
-                      <FileText className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900 dark:text-white">{doc.name}</h3>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <span>{doc.type}</span>
-                        <span>•</span>
-                        <span>{doc.size}</span>
-                        <span>•</span>
-                        <span>{new Date(doc.uploadDate).toLocaleDateString()}</span>
+              {auditDetails.documents.length > 0 ? (
+                auditDetails.documents.map((doc: any) => (
+                  <div key={doc.id} className="flex items-center justify-between p-4 border border-gray-200/50 dark:border-gray-700/50 rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 rounded-lg bg-blue-500/20 text-blue-600 dark:text-blue-400">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900 dark:text-white">{doc.name}</h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <span>{doc.type}</span>
+                          <span>•</span>
+                          <span>{doc.size}</span>
+                          <span>•</span>
+                          <span>{new Date(doc.uploadDate).toLocaleDateString()}</span>
+                        </div>
                       </div>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <button className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDownload(doc)}
+                        className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors">
-                      <Download className="w-4 h-4" />
-                    </button>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-12">
+                  <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No documents yet</h3>
+                  <p className="text-gray-600 dark:text-gray-400">Documents will be available as the audit progresses</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}
@@ -467,7 +383,7 @@ const AuditDetailsContent: React.FC = () => {
           <div className="bg-white/10 dark:bg-gray-800/30 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Audit Timeline</h2>
             <div className="space-y-6">
-              {auditDetails.timeline.map((phase, index) => (
+              {auditDetails.timeline.map((phase: any, index: number) => (
                 <div key={phase.id} className="flex items-start gap-4">
                   <div className="flex flex-col items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -501,6 +417,26 @@ const AuditDetailsContent: React.FC = () => {
               ))}
             </div>
           </div>
+        )}
+      </motion.div>
+
+      {/* Action Buttons */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="flex items-center justify-end space-x-4 pt-4"
+      >
+        {auditDetails.status === 'completed' && (
+          <motion.button
+            onClick={handleReaudit}
+            className="px-6 py-2 bg-gradient-to-r from-secondary-dark to-accent-dark text-white rounded-lg hover:shadow-lg transition-all duration-200 flex items-center space-x-2"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Request Re-audit</span>
+          </motion.button>
         )}
       </motion.div>
     </div>

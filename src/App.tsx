@@ -15,6 +15,7 @@ import TestingDashboard from './pages/Dashboard/TestingDashboard';
 import AuditDetailsPage from './pages/AuditDetailsPage';
 import { useTheme } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
+import { WorkflowProvider } from './context/WorkflowContext';
 import CursorEffect from './components/effects/CursorEffect';
 
 function App() {
@@ -31,26 +32,28 @@ function App() {
 
   return (
     <AuthProvider>
-      <div className={`min-h-screen ${theme === 'dark' ? 'bg-background-dark text-text-dark' : 'bg-gray-300 text-text-light'} transition-colors duration-300`}>
-        <CursorEffect />
-        
-        <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/verify" element={<OTPVerificationPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/get-started" element={<GetStarted />} />
-              <Route path="/dashboard" element={<Dashboard />} /> 
-              <Route path="/help" element={<Help />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/testing" element={<TestingDashboard />} />
-              <Route path="/audit/:id" element={<AuditDetailsPage />} />
-            </Routes>
-        </AnimatePresence>
-      </div>
+      <WorkflowProvider>
+        <div className={`min-h-screen ${theme === 'dark' ? 'bg-background-dark text-text-dark' : 'bg-gray-300 text-text-light'} transition-colors duration-300`}>
+          <CursorEffect />
+          
+          <AnimatePresence mode="wait">
+              <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/verify" element={<OTPVerificationPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/get-started" element={<GetStarted />} />
+                <Route path="/dashboard" element={<Dashboard />} /> 
+                <Route path="/help" element={<Help />} />
+                <Route path="/projects" element={<Projects />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/testing" element={<TestingDashboard />} />
+                <Route path="/audit/:id" element={<AuditDetailsPage />} />
+              </Routes>
+          </AnimatePresence>
+        </div>
+      </WorkflowProvider>
     </AuthProvider>
   );
 }
