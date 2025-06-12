@@ -21,12 +21,12 @@ import {
   Send
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { useWorkflow } from '../context/WorkflowContext';
 import HeroSection from '../components/get-started/HeroSection';
 import FeaturesSection from '../components/get-started/FeaturesSection';
 import ServicesSection from '../components/get-started/ServicesSection';
+import apiClient from '../lib/api';
 
-interface AuditRequestForm {
+interface AuditRequest {
   auditType: string;
   targetUrl: string;
   description: string;
@@ -37,19 +37,18 @@ interface AuditRequestForm {
   contactEmail: string;
   contactPhone: string;
   contactName: string;
+  address: string;
   budget: string;
   preferredStartDate: string;
   additionalRequirements: string;
-  userId: string;
 }
 
 const GetStarted: React.FC = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const { submitAuditRequest, currentUser } = useWorkflow();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<AuditRequestForm>({
+  const [formData, setFormData] = useState<AuditRequest>({
     auditType: '',
     targetUrl: '',
     description: '',
@@ -60,10 +59,10 @@ const GetStarted: React.FC = () => {
     contactEmail: '',
     contactPhone: '',
     contactName: '',
+    address: '',
     budget: '',
     preferredStartDate: '',
-    additionalRequirements: '',
-    userId: currentUser.id
+    additionalRequirements: ''
   });
 
   const auditTypes = [
@@ -109,7 +108,7 @@ const GetStarted: React.FC = () => {
     }
   ];
 
-  const handleInputChange = (field: keyof AuditRequestForm, value: string) => {
+  const handleInputChange = (field: keyof AuditRequest, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -121,13 +120,13 @@ const GetStarted: React.FC = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      submitAuditRequest(formData);
+      await apiClient.post('/audit-requests', formData);
       
       // Show success message and redirect
       alert('Audit request submitted successfully! You will receive a confirmation email shortly.');
       navigate('/dashboard');
     } catch (error: any) {
-      alert('Failed to submit audit request. Please try again.');
+      alert(error.response?.data?.message || 'Failed to submit audit request. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -300,7 +299,7 @@ const GetStarted: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300  mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Preferred Methodology
                 </label>
                 <select
@@ -379,6 +378,19 @@ const GetStarted: React.FC = () => {
                     required
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Company Address
+                </label>
+                <textarea
+                  value={formData.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  rows={3}
+                  className="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Street address, city, state, zip code"
+                />
               </div>
             </div>
           </motion.div>
